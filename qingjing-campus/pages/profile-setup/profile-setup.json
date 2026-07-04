@@ -1,0 +1,11 @@
+{
+  "usingComponents": {
+    "van-button": "@vant/weapp/button/index",
+    "van-icon": "@vant/weapp/icon/index",
+    "van-cell-group": "@vant/weapp/cell-group/index",
+    "van-field": "@vant/weapp/field/index"
+  },
+  "navigationBarTitleText": "完善资料",
+  "navigationBarBackgroundColor": "#10B981",
+  "navigationBarTextStyle": "white"
+}

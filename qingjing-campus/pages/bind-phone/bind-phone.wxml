@@ -1,0 +1,36 @@
+<!-- pages/bind-phone/bind-phone.wxml -->
+<view class="bind-phone-page">
+  <view class="bind-header">
+    <van-icon name="phone-o" size="80rpx" color="#10B981" />
+    <text class="bind-title">绑定手机号</text>
+    <text class="bind-subtitle">输入11位手机号完成绑定</text>
+  </view>
+  <view class="bind-form">
+    <van-cell-group inset>
+      <van-field
+        model:value="{{ phone }}"
+        label="手机号"
+        placeholder="请输入11位手机号"
+        type="number"
+        maxlength="11"
+        clearable
+        border="{{ true }}"
+        bind:input="onPhoneInput"
+      />
+    </van-cell-group>
+    <van-button
+      type="primary"
+      block
+      round
+      color="linear-gradient(135deg, #10B981 0%, #059669 100%)"
+      custom-class="bind-btn"
+      bindtap="onBindPhone"
+      loading="{{ binding }}"
+    >
+      确认绑定
+    </van-button>
+    <view class="skip-btn" bindtap="onSkip">
+      <text>暂不绑定</text>
+    </view>
+  </view>
+</view>

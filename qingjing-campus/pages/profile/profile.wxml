@@ -1,0 +1,139 @@
+<!-- pages/profile/profile.wxml -->
+
+<view class="profile-page">
+  <!-- 顶部用户信息 -->
+  <view class="user-header">
+    <!-- 头像区域：使用 button 触发 chooseAvatar -->
+    <button
+      class="avatar-btn"
+      open-type="chooseAvatar"
+      bind:chooseavatar="onChooseAvatar"
+    >
+      <!-- 加载中 -->
+      <view wx:if="{{ avatarLoading }}" class="avatar-wrap">
+        <view class="avatar-loading">
+          <van-loading type="spinner" color="#10B981" size="40rpx" />
+        </view>
+      </view>
+      <!-- 有头像：显示头像（带时间戳防缓存） -->
+      <view wx:elif="{{ userInfo.avatarUrl }}" class="avatar-wrap">
+        <image
+          class="avatar-img"
+          src="{{ userInfo.avatarUrl + (avatarUrlTs ? '?t=' + avatarUrlTs : '') }}"
+          mode="aspectFill"
+          lazy-load="{{ false }}"
+          binderror="onAvatarLoadError"
+        />
+      </view>
+      <!-- 无头像：显示默认占位 -->
+      <view wx:else class="avatar-wrap avatar-default">
+        <van-icon name="user-circle-o" size="80rpx" color="#ffffff" />
+      </view>
+      <!-- 编辑角标已删除 -->
+    </button>
+    <text class="nickname">{{ userInfo.nickname || userInfo.studentName || '微信用户' }}</text>
+    <text class="name" wx:if="{{ userInfo.studentName && userInfo.studentName !== userInfo.nickname }}">{{ userInfo.studentName }}</text>
+    <text class="phone" wx:if="{{ userInfo.phone }}">📱 {{ userInfo.phone }}</text>
+    <text class="phone unbind" wx:else>未绑定手机号</text>
+  </view>
+
+  <!-- 数据统计 -->
+  <view class="stats-row">
+    <view class="stat-card">
+      <text class="stat-num">{{ userInfo.studiedCardCount || 0 }}</text>
+      <text class="stat-label">已学卡片</text>
+    </view>
+    <view class="stat-card">
+      <text class="stat-num">{{ userInfo.totalRecognitionCount || 0 }}</text>
+      <text class="stat-label">识别次数</text>
+    </view>
+    <view class="stat-card" bindtap="goToClass">
+      <text class="stat-num">{{ userInfo.classId ? '已入班' : '未入班' }}</text>
+      <text class="stat-label">我的班级</text>
+    </view>
+  </view>
+
+  <!-- 功能列表 -->
+  <view class="menu-section">
+    <van-cell-group inset>
+      <van-cell title="编辑资料" icon="edit" icon-color="#10B981" is-link bind:click="onEdit" />
+      
+      <!-- 绑定/换绑手机号 -->
+      <van-cell 
+        title="{{ userInfo.phone ? '换绑手机号' : '绑定手机号' }}" 
+        icon="phone-o" 
+        icon-color="#10B981" 
+        is-link 
+        bind:click="goBindPhone" 
+        label="{{ userInfo.phone ? '当前：' + userInfo.phone : '绑定后可使用更多功能' }}" 
+      />
+      
+      <van-cell title="识别记录" icon="records-o" icon-color="#1E90FF" is-link bind:click="goToHistory" label="查看历史拍照识别结果" />
+      <van-cell title="我的班级" icon="friends-o" icon-color="#10B981" is-link bind:click="goToClass" label="{{ userInfo.classId ? '已加入班级' : '输入邀请码加入班级' }}" />
+      <van-cell title="学习进度" icon="chart-trending-o" icon-color="#F59E0B" is-link bind:click="goToLearn" label="已学习 {{ userInfo.studiedCardCount || 0 }} 张卡片" />
+    </van-cell-group>
+  </view>
+
+  <!-- 编辑资料弹窗 -->
+  <van-popup show="{{ editing }}" position="bottom" round bind:close="onCancel">
+    <view class="edit-popup">
+      <view class="edit-title">编辑资料</view>
+      <van-cell-group inset>
+        <van-field label="昵称" value="{{ tempNickname }}" placeholder="请输入昵称" clearable bind:input="onNicknameInput" />
+        <van-field label="姓名" value="{{ tempStudentName }}" placeholder="请输入真实姓名" clearable bind:input="onNameInput" />
+      </van-cell-group>
+      <view class="edit-btns">
+        <van-button type="primary" block round color="#10B981" bindtap="onSaveProfile">保存</van-button>
+        <van-button type="default" block round bindtap="onCancel">取消</van-button>
+      </view>
+    </view>
+  </van-popup>
+
+  <!-- 换绑手机号弹窗 -->
+  <van-popup show="{{ showPhonePopup }}" position="bottom" round bind:close="onClosePhonePopup">
+    <view class="phone-popup">
+      <view class="phone-popup-title">
+        {{ userInfo.phone ? '更换手机号' : '绑定手机号' }}
+      </view>
+      <view class="phone-popup-subtitle" wx:if="{{ userInfo.phone }}">
+        当前手机号：{{ userInfo.phone }}
+      </view>
+      <van-cell-group inset>
+        <van-field
+          label="手机号"
+          type="number"
+          maxlength="11"
+          placeholder="请输入11位手机号"
+          value="{{ phoneInput }}"
+          clearable
+          bind:input="onPhoneInput"
+        />
+      </van-cell-group>
+      <view class="phone-popup-btns">
+        <van-button 
+          type="primary" 
+          block 
+          round 
+          color="#10B981" 
+          bindtap="onConfirmBindPhone"
+          loading="{{ bindingPhone }}"
+        >
+          {{ userInfo.phone ? '确认更换' : '确认绑定' }}
+        </van-button>
+        <van-button type="default" block round bindtap="onClosePhonePopup">取消</van-button>
+      </view>
+    </view>
+  </van-popup>
+
+  <!-- 退出/注销 -->
+  <view class="logout-section">
+    <van-button type="default" block round custom-class="logout-btn" bindtap="onLogout">
+      <van-icon name="close" size="32rpx" color="#EF4444" />
+      退出登录
+    </van-button>
+    <van-button type="default" block round custom-class="cancel-btn" bindtap="onCancelAccount">
+      <van-icon name="delete-o" size="32rpx" color="#999999" />
+      注销账号
+    </van-button>
+  </view>
+</view>

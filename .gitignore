@@ -1,0 +1,13 @@
+.DS_Store
+Thumbs.db
+*.log
+.env
+
+qingjing-campus/node_modules/
+qingjing-campus/miniprogram_npm/
+qingjing-campus/project.private.config.json
+
+qingjing-project/node_modules/
+qingjing-project/dist/
+qingjing-project/.vscode/
+qingjing-project/*.local

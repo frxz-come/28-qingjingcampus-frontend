@@ -1,0 +1,12 @@
+{
+  "usingComponents": {
+    "van-tag": "@vant/weapp/tag/index",
+    "van-icon": "@vant/weapp/icon/index",
+    "van-button": "@vant/weapp/button/index",
+    "van-loading": "@vant/weapp/loading/index",
+    "van-overlay": "@vant/weapp/overlay/index"
+  },
+  "navigationBarTitleText": "学习卡片",
+  "navigationBarBackgroundColor": "#10B981",
+  "navigationBarTextStyle": "white"
+}

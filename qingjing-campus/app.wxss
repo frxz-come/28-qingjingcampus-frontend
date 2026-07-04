@@ -1,0 +1,55 @@
+/* app.wxss */
+/* ============================================
+   全局公共样式
+   作用：定义整个小程序的配色、间距、字体
+   ============================================ */
+
+/* 页面根节点默认样式 */
+page {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-size: 28rpx;           /* 小程序推荐用 rpx 做单位，自适应屏幕 */
+  color: #333333;
+  background-color: #f5f7fa;  /* 浅灰背景，护眼 */
+  height: 100%;
+}
+
+/* 主色调变量（文档要求：环保绿色调） */
+/* 可回收物-蓝、有害-红、厨余-绿、其他-灰 */
+:root {
+  --primary-green: #10B981;
+  --primary-blue: #1E90FF;
+  --danger-red: #EF4444;
+  --warning-orange: #F59E0B;
+  --gray: #6B7280;
+}
+
+/* 通用容器 */
+.container {
+  padding: 30rpx;
+  box-sizing: border-box;
+}
+
+/* 卡片通用样式 */
+.card {
+  background: #ffffff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
+}
+
+/* 按钮主色调 */
+.btn-primary {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  color: #ffffff;
+  border-radius: 40rpx;
+  font-size: 30rpx;
+  font-weight: 500;
+}
+
+/* 文本省略 */
+.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

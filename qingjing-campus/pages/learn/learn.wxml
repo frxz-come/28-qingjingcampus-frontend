@@ -1,0 +1,175 @@
+<!-- pages/learn/learn.wxml -->
+<view class="learn-page">
+
+<!-- ========== 概览页 ========== -->
+<view wx:if="{{ pageState === 'overview' }}" class="overview-page">
+  <view class="progress-header">
+    <view class="progress-info">
+      <text class="progress-title">我的学习进度</text>
+      <text class="progress-num">{{ overview.studiedCardCount }} / {{ overview.totalCardCount }} 张</text>
+    </view>
+    <view class="progress-bar">
+      <view class="progress-fill" style="width: {{ overview.progressPercent }}%;"></view>
+    </view>
+    <text class="progress-tip">完成全部学习可获得环保小卫士勋章</text>
+  </view>
+
+  <view class="category-grid">
+    <block wx:for="{{ overview.categories }}" wx:key="mainCategory">
+      <view class="category-card" bindtap="onCategoryTap" data-category="{{ item.mainCategory }}">
+        <!-- 分类封面图：添加binderror调试 -->
+        <image 
+          class="category-cover" 
+          src="{{ item.coverImage }}" 
+          mode="aspectFill"
+          binderror="onImageError"
+          data-index="{{ index }}"
+          data-type="category"
+          data-src="{{ item.coverImage }}"
+        />
+        <view class="category-info">
+          <text class="category-name">{{ item.mainCategory }}</text>
+          <text class="category-count">{{ item.studiedCount }} / {{ item.cardCount }} 张</text>
+        </view>
+        <view class="category-progress">
+          <view class="category-progress-fill" style="width: {{ item.progressPercent }}%;"></view>
+        </view>
+      </view>
+    </block>
+  </view>
+</view>
+
+<!-- ========== 列表页 ========== -->
+<view wx:if="{{ pageState === 'list' }}" class="list-page">
+  <view class="nav-header">
+    <van-icon name="arrow-left" size="40rpx" color="#333" bindtap="backToOverview" />
+    <text class="nav-title">{{ currentCategory }}</text>
+    <view style="width: 40rpx;"></view>
+  </view>
+
+  <scroll-view scroll-y class="card-list">
+    <block wx:for="{{ cardList }}" wx:key="cardId">
+      <view class="card-item {{ item.studied ? 'studied' : '' }}" bindtap="onCardTap" data-index="{{ index }}">
+        <!-- 卡片缩略图：添加binderror调试 -->
+        <image 
+          class="card-thumb" 
+          src="{{ item.cardImage }}" 
+          mode="aspectFill"
+          binderror="onImageError"
+          data-index="{{ index }}"
+          data-type="card"
+          data-src="{{ item.cardImage }}"
+        />
+        <view class="card-info">
+          <view class="card-title-row">
+            <van-tag color="{{ item.studied ? '#10B981' : '#999' }}" text-color="#ffffff">{{ item.studied ? '已学' : '未学' }}</van-tag>
+            <text class="card-title">{{ item.cardTitle }}</text>
+          </view>
+          <text class="card-sub">{{ item.subCategory }}</text>
+        </view>
+        <van-icon name="arrow" color="#ccc" />
+      </view>
+    </block>
+  </scroll-view>
+</view>
+
+<!-- ========== 详情页 ========== -->
+<view wx:if="{{ pageState === 'detail' }}" class="detail-page">
+  <view class="nav-header">
+    <van-icon name="arrow-left" size="40rpx" color="#333" bindtap="backToList" />
+    <text class="nav-title">{{ currentCard.cardTitle }}</text>
+    <view style="width: 40rpx;"></view>
+  </view>
+
+  <scroll-view scroll-y class="detail-scroll">
+    <!-- 详情大图：添加binderror调试 -->
+    <image 
+      class="detail-image" 
+      src="{{ currentCard.cardImage }}" 
+      mode="aspectFill"
+      binderror="onImageError"
+      data-type="detail"
+      data-src="{{ currentCard.cardImage }}"
+    />
+    
+    <view class="detail-tags">
+      <van-tag color="{{ currentCard.mainCategory === '可回收物' ? '#1E90FF' : currentCard.mainCategory === '有害垃圾' ? '#EF4444' : currentCard.mainCategory === '厨余垃圾' ? '#10B981' : '#6B7280' }}" text-color="#ffffff" size="large">{{ currentCard.mainCategory }}</van-tag>
+      <text class="detail-sub">{{ currentCard.subCategory }}</text>
+    </view>
+
+    <view class="detail-section" wx:if="{{ currentCard.commonExamples && currentCard.commonExamples.length > 0 }}">
+      <view class="section-label">
+        <van-icon name="label-o" size="32rpx" color="#10B981" />
+        <text>常见举例</text>
+      </view>
+      <view class="examples-list">
+        <block wx:for="{{ currentCard.commonExamples }}" wx:key="*this">
+          <text class="example-tag">{{ item }}</text>
+        </block>
+      </view>
+    </view>
+
+    <view class="detail-section">
+      <view class="section-label">
+        <van-icon name="description-o" size="32rpx" color="#10B981" />
+        <text>知识内容</text>
+      </view>
+      <text class="section-text">{{ currentCard.cardContent }}</text>
+    </view>
+
+    <view class="detail-section">
+      <view class="section-label">
+        <van-icon name="guide-o" size="32rpx" color="#10B981" />
+        <text>投放要求</text>
+      </view>
+      <text class="section-text">{{ currentCard.disposalRequirement }}</text>
+    </view>
+
+    <view class="detail-section">
+      <view class="section-label">
+        <van-icon name="warning-o" size="32rpx" color="#10B981" />
+        <text>注意事项</text>
+      </view>
+      <text class="section-text">{{ currentCard.precautions }}</text>
+    </view>
+  </scroll-view>
+
+  <view class="detail-footer">
+    <view class="nav-btns">
+      <van-button type="default" size="small" disabled="{{ currentIndex === 0 }}" bindtap="prevCard">上一张</van-button>
+      <text class="page-num">{{ currentIndex + 1 }} / {{ cardList.length }}</text>
+      <van-button type="default" size="small" disabled="{{ currentIndex === cardList.length - 1 }}" bindtap="nextCard">下一张</van-button>
+    </view>
+    
+    <van-button
+      wx:if="{{ !currentCard.studied }}"
+      type="primary"
+      block
+      round
+      color="#10B981"
+      bindtap="onMarkStudied"
+      loading="{{ loading }}"
+    >
+      完成学习
+    </van-button>
+    <van-button
+      wx:else
+      type="default"
+      block
+      round
+      disabled
+    >
+      <van-icon name="checked" size="32rpx" color="#10B981" />
+      已完成学习
+    </van-button>
+  </view>
+</view>
+
+<!-- 全局加载 -->
+<van-overlay show="{{ loading }}" z-index="100">
+  <view class="loading-box">
+    <van-loading type="spinner" color="#10B981" />
+  </view>
+</van-overlay>
+
+</view>

@@ -1,0 +1,61 @@
+<!-- pages/heatmap/heatmap.wxml -->
+<view class="heatmap-page">
+
+<!-- 图片对比区域 -->
+<view class="image-compare">
+  <view class="image-box">
+    <text class="image-label">原始图片</text>
+    <image wx:if="{{ originalImage }}" class="compare-image" src="{{ originalImage }}" mode="aspectFit" bindtap="previewImage" data-type="original" binderror="onImageError" data-type="original"/>
+    <view wx:else class="image-placeholder">
+      <text>图片加载失败</text>
+    </view>
+  </view>
+  <view class="image-box">
+    <text class="image-label">AI 关注区域</text>
+    <image wx:if="{{ heatmapImage }}" class="compare-image" src="{{ heatmapImage }}" mode="aspectFit" bindtap="previewImage" data-type="heatmap" binderror="onImageError" data-type="heatmap"/>
+    <view wx:else class="image-placeholder">
+      <text>热力图加载失败</text>
+    </view>
+  </view>
+</view>
+
+<!-- 说明卡片 -->
+<view class="explain-card">
+  <view class="explain-title">
+    <van-icon name="info-o" size="32rpx" color="#EF4444" />
+    <text>热力图说明</text>
+  </view>
+  <text class="explain-text">
+    红色区域表示 AI 模型做出分类判断时最关注的图像区域。颜色越红，表示该区域对分类结果的影响越大。
+  </text>
+  <view class="explain-detail">
+    <view class="detail-item">
+      <view class="color-block" style="background: #FF0000;"></view>
+      <text>高度关注区域</text>
+    </view>
+    <view class="detail-item">
+      <view class="color-block" style="background: #FFFF00;"></view>
+      <text>中等关注区域</text>
+    </view>
+    <view class="detail-item">
+      <view class="color-block" style="background: #0000FF;"></view>
+      <text>低关注区域</text>
+    </view>
+  </view>
+</view>
+
+<!-- 分类结果信息 -->
+<view class="result-info">
+  <van-tag color="{{ categoryColor }}" text-color="#ffffff" size="large">{{ category }}</van-tag>
+  <text class="sub-category">{{ subCategory }}</text>
+  <text class="confidence">置信度 {{ confidencePercent }}%</text>
+</view>
+
+<!-- 底部按钮 -->
+<view class="bottom-actions">
+  <van-button type="primary" block round color="#EF4444" bindtap="goBack">
+    返回识别结果
+  </van-button>
+</view>
+
+</view>

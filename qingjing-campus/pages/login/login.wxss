@@ -1,0 +1,70 @@
+/* pages/login/login.wxss */
+.login-page {
+  min-height: 100vh;
+  background-color: #f5f7fa;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.header-bg {
+  height: 400rpx;
+  background: linear-gradient(180deg, #10B981 0%, #059669 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom-left-radius: 40rpx;
+  border-bottom-right-radius: 40rpx;
+  flex-shrink: 0;
+}
+
+.brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #ffffff;
+}
+
+.app-name {
+  font-size: 48rpx;
+  font-weight: bold;
+  margin-top: 20rpx;
+  letter-spacing: 4rpx;
+}
+
+.app-slogan {
+  font-size: 26rpx;
+  margin-top: 12rpx;
+  opacity: 0.9;
+}
+
+.content-card {
+  margin: -60rpx 30rpx 0 30rpx;
+  background: #ffffff;
+  border-radius: 24rpx 24rpx 0 0;
+  padding: 40rpx 20rpx 80rpx 20rpx;
+  box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.06);
+  position: relative;
+  z-index: 1;
+  flex: 1;
+}
+
+.wx-login-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60rpx 0;
+}
+
+.wx-tip {
+  font-size: 28rpx;
+  color: #666666;
+  margin-top: 24rpx;
+  margin-bottom: 40rpx;
+}
+
+.wx-btn {
+  width: 80% !important;
+  height: 90rpx !important;
+  font-size: 32rpx !important;
+}

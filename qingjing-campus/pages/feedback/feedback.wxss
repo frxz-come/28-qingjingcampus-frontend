@@ -1,0 +1,90 @@
+/* pages/feedback/feedback.wxss */
+.feedback-page {
+  padding: 30rpx;
+  background: #f5f7fa;
+  min-height: 100vh;
+}
+
+.info-card {
+  background: #ffffff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 30rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.label {
+  font-size: 26rpx;
+  color: #999999;
+}
+
+.result-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.sub {
+  font-size: 30rpx;
+  color: #333333;
+  font-weight: 600;
+}
+
+.section-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #333333;
+  margin: 30rpx 0 20rpx 20rpx;
+}
+
+/* 上传区域 */
+.upload-section {
+  padding: 0 20rpx;
+}
+
+.upload-btn {
+  width: 200rpx;
+  height: 200rpx;
+  border: 2rpx dashed #cccccc;
+  border-radius: 16rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+  color: #999999;
+  font-size: 26rpx;
+  background: #ffffff;
+}
+
+.upload-preview {
+  position: relative;
+  width: 200rpx;
+  height: 200rpx;
+}
+
+.upload-preview image {
+  width: 100%;
+  height: 100%;
+  border-radius: 16rpx;
+}
+
+.delete-btn {
+  position: absolute;
+  top: -10rpx;
+  right: -10rpx;
+  width: 40rpx;
+  height: 40rpx;
+  background: #EF4444;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.submit-btn {
+  margin-top: 60rpx !important;
+  height: 90rpx !important;
+}

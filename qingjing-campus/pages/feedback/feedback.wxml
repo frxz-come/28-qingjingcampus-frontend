@@ -1,0 +1,73 @@
+<!-- pages/feedback/feedback.wxml -->
+<view class="feedback-page">
+
+<!-- 系统识别结果 -->
+<view class="info-card">
+  <text class="label">系统识别结果</text>
+  <view class="result-row">
+    <van-tag color="{{ systemColor }}" text-color="#ffffff">{{ systemCategory }}</van-tag>
+    <text class="sub">{{ systemSubCategory }}</text>
+  </view>
+</view>
+
+<!-- 正确分类选择 -->
+<view class="section-title">请选择正确的分类</view>
+<van-cell-group inset>
+  <van-radio-group value="{{ correctCategory }}" bind:change="onCategoryChange">
+    <van-cell title="可回收物" clickable data-name="可回收物" bind:click="onCategoryClick">
+      <van-radio slot="right-icon" name="可回收物" />
+    </van-cell>
+    <van-cell title="有害垃圾" clickable data-name="有害垃圾" bind:click="onCategoryClick">
+      <van-radio slot="right-icon" name="有害垃圾" />
+    </van-cell>
+    <van-cell title="厨余垃圾" clickable data-name="厨余垃圾" bind:click="onCategoryClick">
+      <van-radio slot="right-icon" name="厨余垃圾" />
+    </van-cell>
+    <van-cell title="其他垃圾" clickable data-name="其他垃圾" bind:click="onCategoryClick">
+      <van-radio slot="right-icon" name="其他垃圾" />
+    </van-cell>
+  </van-radio-group>
+</van-cell-group>
+
+<!-- 补充图片 -->
+<view class="section-title">补充图片（可选）</view>
+<view class="upload-section">
+  <view class="upload-btn" bindtap="chooseImage" wx:if="{{ !supplementImage }}">
+    <van-icon name="photograph" size="48rpx" color="#999999" />
+    <text>上传图片</text>
+  </view>
+  <view class="upload-preview" wx:else>
+    <image src="{{ supplementImage }}" mode="aspectFill" bindtap="chooseImage" />
+    <view class="delete-btn" bindtap="deleteImage">
+      <van-icon name="cross" size="24rpx" color="#ffffff" />
+    </view>
+  </view>
+</view>
+
+<!-- 文字说明 -->
+<view class="section-title">补充说明（可选）</view>
+<van-cell-group inset>
+  <van-field
+    value="{{ description }}"
+    type="textarea"
+    placeholder="请描述您认为识别错误的原因，帮助我们改进..."
+    autosize
+    border="{{ false }}"
+    bind:input="onDescriptionInput"
+  />
+</van-cell-group>
+
+<!-- 提交按钮 -->
+<van-button
+  type="primary"
+  block
+  round
+  color="#F59E0B"
+  custom-class="submit-btn"
+  bindtap="submitFeedback"
+  loading="{{ loading }}"
+>
+  提交反馈
+</van-button>
+
+</view>

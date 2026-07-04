@@ -1,0 +1,71 @@
+<!-- pages/profile-setup/profile-setup.wxml -->
+<view class="setup-page">
+  <view class="setup-header">
+    <text class="setup-title">完善个人资料</text>
+    <text class="setup-subtitle">让我们更好地认识你</text>
+  </view>
+
+  <view class="avatar-section">
+    <button 
+      class="avatar-btn" 
+      open-type="chooseAvatar" 
+      bind:chooseavatar="onChooseAvatar"
+    >
+      <image 
+        class="avatar-img" 
+        src="{{ avatarUrl || '/static/images/default-avatar.png' }}" 
+        mode="aspectFill"
+      />
+      <text class="avatar-text">{{ avatarUrl ? '点击更换头像' : '点击选择头像' }}</text>
+    </button>
+  </view>
+
+  <view class="form-section">
+    <van-cell-group inset>
+      <van-field
+        label="昵称"
+        type="nickname"
+        placeholder="请输入昵称"
+        value="{{ nickname }}"
+        clearable
+        border="{{ true }}"
+        bind:input="onNicknameInput"
+      />
+    </van-cell-group>
+  </view>
+
+  <view class="phone-section">
+    <view class="section-label">绑定手机号</view>
+    <button 
+      class="phone-btn" 
+      open-type="getPhoneNumber" 
+      bind:getphonenumber="onGetPhoneNumber"
+      wx:if="{{ !phone }}"
+    >
+      <van-icon name="phone-o" size="32rpx" color="#10B981" />
+      <text>授权绑定手机号</text>
+    </button>
+    <view class="phone-bound" wx:else>
+      <van-icon name="passed" size="32rpx" color="#10B981" />
+      <text>已绑定：{{ phone }}</text>
+    </view>
+  </view>
+
+  <view class="action-section">
+    <van-button
+      type="primary"
+      block
+      round
+      color="linear-gradient(135deg, #10B981 0%, #059669 100%)"
+      custom-class="save-btn"
+      bindtap="onSaveProfile"
+      loading="{{ saving }}"
+    >
+      保存并进入首页
+    </van-button>
+    
+    <view class="skip-btn" bindtap="onSkip">
+      <text>跳过，稍后完善</text>
+    </view>
+  </view>
+</view>

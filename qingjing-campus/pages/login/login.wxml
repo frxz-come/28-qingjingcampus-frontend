@@ -1,0 +1,30 @@
+<!-- pages/login/login.wxml -->
+<view class="login-page">
+  <view class="header-bg">
+    <view class="brand">
+      <van-icon name="flower-o" size="80rpx" color="#ffffff" />
+      <text class="app-name">青净校园</text>
+      <text class="app-slogan">垃圾分类，校园更清新</text>
+    </view>
+  </view>
+  <view class="content-card">
+    <view class="wx-login-area">
+      <van-icon name="wechat" size="120rpx" color="#07C160" />
+      <text class="wx-tip">微信一键登录，快速开始</text>
+      <van-button
+        type="primary"
+        block
+        round
+        color="#07C160"
+        loading="{{ loading }}"
+        custom-class="wx-btn"
+        bindtap="onWxLogin"
+      >
+        微信一键登录
+      </van-button>
+    </view>
+    <van-divider contentPosition="center" customStyle="margin-top: 40rpx;">
+      青净校园 · 科技+教育
+    </van-divider>
+  </view>
+</view>
