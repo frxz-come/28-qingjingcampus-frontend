@@ -19,6 +19,7 @@
             <div class="carousel-arrow carousel-arrow-left" @click="prevChart">
               <el-icon><ArrowLeft /></el-icon>
             </div>
+
             <!-- 图表内容 - 平滑滑动 -->
             <div class="carousel-wrapper">
               <div class="carousel-track" :style="trackStyle">
@@ -29,6 +30,7 @@
                   </div>
                   <div ref="classChartRef" class="chart"></div>
                 </div>
+
                 <!-- 幻灯片2：近7天识别与学习趋势 -->
                 <div class="chart-slide">
                   <div class="chart-header">
@@ -36,13 +38,14 @@
                   </div>
                   <div ref="trendChartRef" class="chart"></div>
                 </div>
+
                 <!-- 幻灯片3：班级排名 Top5 -->
                 <div class="chart-slide table-slide">
                   <div class="chart-header">
                     <span>班级排名（Top 5）</span>
                   </div>
                   <div class="slide-content">
-                    <el-table :data="top5RankList" border size="small" v-loading="rankLoading">
+                    <el-table :data="top5RankList" border size="small" v-loading="rankLoading" height="100%" style="width: 100%;">
                       <el-table-column type="index" label="排名" width="60" align="center">
                         <template #default="{ $index }">
                           <el-tag v-if="$index < 3" :type="['danger', 'warning', 'success'][$index]">{{ $index + 1 }}</el-tag>
@@ -67,6 +70,7 @@
                     <el-empty v-if="top5RankList.length === 0 && !rankLoading" description="暂无数据" :image-size="60" />
                   </div>
                 </div>
+
                 <!-- 幻灯片4：各班人均识别数与人均学习卡片数 -->
                 <div class="chart-slide">
                   <div class="chart-header">
@@ -76,10 +80,12 @@
                 </div>
               </div>
             </div>
+
             <!-- 右箭头 -->
             <div class="carousel-arrow carousel-arrow-right" @click="nextChart">
               <el-icon><ArrowRight /></el-icon>
             </div>
+
             <!-- 指示器 -->
             <div class="carousel-indicators">
               <span
@@ -119,7 +125,7 @@ let barChart = null
 // 轮播相关
 const currentChartIndex = ref(0)
 const autoPlayTimer = ref(null)
-const AUTO_PLAY_INTERVAL = 3000 // 3秒自动切换
+const AUTO_PLAY_INTERVAL = 3000
 const isTransitioning = ref(false)
 const SLIDE_COUNT = 4
 
@@ -128,13 +134,12 @@ const rankList = ref([])
 const rankLoading = ref(false)
 const top5RankList = computed(() => rankList.value.slice(0, 5))
 
-// 轨道样式 - 实现平滑滑动
+// 轨道样式
 const trackStyle = computed(() => ({
   transform: `translateX(-${currentChartIndex.value * (100 / SLIDE_COUNT)}%)`,
   transition: isTransitioning.value ? 'transform 0.5s ease-in-out' : 'none'
 }))
 
-// 年级排序权重
 const gradeOrder = {
   '一年级': 1, '一年': 1,
   '二年级': 2, '二年': 2,
@@ -144,13 +149,11 @@ const gradeOrder = {
   '六年级': 6, '六年': 6
 }
 
-// 提取班级数字用于排序
 function extractClassNumber(className) {
   const match = className.match(/(\d+)/)
   return match ? parseInt(match[1]) : 0
 }
 
-// 按年级+班级排序
 function sortByGradeAndClass(list) {
   return [...list].sort((a, b) => {
     const gradeA = gradeOrder[a.grade] || 99
@@ -168,17 +171,14 @@ async function loadDashboard() {
     const classComparison = data.classComparison || []
     const dailyTrend = data.dailyTrend || []
 
-    // ========== 计算平均参与率 ==========
     let totalParticipatedStudents = 0
     let totalStudents = 0
-
     classComparison.forEach(item => {
       const studentCount = item.studentCount || 0
       const participationRate = item.participationRate || 0
       totalStudents += studentCount
       totalParticipatedStudents += Math.round(participationRate / 100 * studentCount)
     })
-
     const avgParticipation = totalStudents > 0
       ? Math.round(totalParticipatedStudents / totalStudents * 100)
       : 0
@@ -190,26 +190,22 @@ async function loadDashboard() {
       { value: avgParticipation + '%', label: '平均参与率', color: '#F56C6C' }
     ]
 
-    // ========== 处理排名数据：按综合得分排序，取Top5 ==========
     rankLoading.value = true
     const processedList = classComparison.map(item => {
       const studentCount = item.studentCount || 0
       const totalStudiedCards = item.totalStudiedCards || 0
       const totalRecognition = item.totalRecognition || 0
-      
       const avgStudiedCards = studentCount > 0
         ? parseFloat((totalStudiedCards / studentCount).toFixed(1))
         : 0
       const avgRecognition = studentCount > 0
         ? parseFloat((totalRecognition / studentCount).toFixed(1))
         : (item.avgRecognition || 0)
-      
       const compositeScore = parseFloat((avgRecognition + avgStudiedCards).toFixed(1))
-
       return {
         className: item.className || '-',
         grade: item.grade || '-',
-        teacherName: item.teacherName || '-',
+        teacherName: item.teacherName || item.teacher || '-',
         studentCount: studentCount,
         participationRate: item.participationRate || 0,
         avgRecognition: avgRecognition,
@@ -217,15 +213,15 @@ async function loadDashboard() {
         compositeScore: compositeScore
       }
     })
-
-    // 按综合得分降序，取前5
     rankList.value = processedList.sort((a, b) => b.compositeScore - a.compositeScore)
     rankLoading.value = false
 
+    // 按年级+班级排序后的数据用于图表
+    const sortedClassComparison = sortByGradeAndClass(classComparison)
+
     await nextTick()
-    initClassChart(classComparison)
+    initClassChart(sortedClassComparison)
     initTrendChart(dailyTrend)
-    // 柱状图使用按年级班级排序后的数据
     initBarChart(sortByGradeAndClass(processedList))
     startAutoPlay()
   } catch (e) {
@@ -267,7 +263,6 @@ function initTrendChart(dailyTrend) {
       itemHeight: 8,
       textStyle: { fontSize: 11 }
     },
-    // 修改：调整 grid 减少左边空白
     grid: { left: '2%', right: '3%', bottom: '12%', top: '12%', containLabel: true },
     xAxis: {
       type: 'category',
@@ -303,11 +298,9 @@ function initTrendChart(dailyTrend) {
 function initBarChart(sortedData) {
   if (!barChartRef.value) return
   if (barChart) { barChart.dispose(); barChart = null }
-
   const classNames = sortedData.map(item => item.className)
   const avgStudiedCards = sortedData.map(item => item.avgStudiedCards)
   const avgRecognition = sortedData.map(item => item.avgRecognition)
-
   barChart = echarts.init(barChartRef.value)
   barChart.setOption({
     tooltip: {
@@ -322,19 +315,16 @@ function initBarChart(sortedData) {
       }
     },
     legend: { data: ['人均学习卡片', '人均识别次数'], bottom: 0, itemHeight: 10, textStyle: { fontSize: 12 } },
-    // 修改：调整 grid 确保"平均数"显示完整
     grid: { left: '5%', right: '4%', bottom: '15%', top: '10%', containLabel: true },
     xAxis: {
       type: 'category',
       data: classNames,
-      // 修改：字体不旋转，正常显示
       axisLabel: { interval: 0, rotate: 0, fontSize: 12 }
     },
-    yAxis: { 
-      type: 'value', 
-      name: '平均数', 
+    yAxis: {
+      type: 'value',
+      name: '平均数',
       nameTextStyle: { fontSize: 12 },
-      // 确保Y轴标签显示完整
       axisLabel: { fontSize: 11 }
     },
     series: [
@@ -355,7 +345,6 @@ function initBarChart(sortedData) {
   })
 }
 
-// 轮播控制
 function nextChart() {
   isTransitioning.value = true
   currentChartIndex.value = (currentChartIndex.value + 1) % SLIDE_COUNT
@@ -401,7 +390,6 @@ function stopAutoPlay() {
   }
 }
 
-// 监听窗口大小变化
 function handleResize() {
   if (classChart) classChart.resize()
   if (trendChart) trendChart.resize()
@@ -515,7 +503,7 @@ onBeforeUnmount(() => {
   right: 10px;
 }
 
-/* 轮播包装器 - 隐藏溢出 */
+/* 轮播包装器 */
 .carousel-wrapper {
   width: 100%;
   height: 100%;
@@ -523,10 +511,10 @@ onBeforeUnmount(() => {
   position: relative;
 }
 
-/* 轮播轨道 - 横向排列所有幻灯片 */
+/* 轮播轨道 */
 .carousel-track {
   display: flex;
-  width: 400%; /* 4张幻灯片，每张25% */
+  width: 400%;
   height: 100%;
 }
 
@@ -541,7 +529,7 @@ onBeforeUnmount(() => {
   box-sizing: border-box;
 }
 
-/* 表格类型幻灯片 - 调整padding使表格占满空间 */
+/* 表格类型幻灯片 */
 .table-slide {
   padding: 20px 40px 40px;
 }
@@ -549,16 +537,33 @@ onBeforeUnmount(() => {
 .table-slide .slide-content {
   flex: 1;
   min-height: 0;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-/* 表格样式调整：让表格占满高度 */
+/* 表格占满高度 */
 .table-slide :deep(.el-table) {
+  flex: 1;
+  height: 100% !important;
+}
+
+.table-slide :deep(.el-table__inner-wrapper) {
   height: 100%;
 }
 
 .table-slide :deep(.el-table__body-wrapper) {
+  flex: 1;
   overflow-y: auto;
+}
+
+/* 增加行高，让5行数据更饱满，消除下方留白 */
+.table-slide :deep(.el-table__row) {
+  height: auto;
+}
+
+.table-slide :deep(.el-table .cell) {
+  padding: 14px 4px;
 }
 
 .chart-header {

@@ -1,9 +1,9 @@
 /* pages/class/class.wxss */
-
 .class-page {
   min-height: 100vh;
   background-color: #f5f7fa;
   padding: 30rpx;
+  position: relative;
 }
 
 /* ===== 加入班级区域 ===== */
@@ -23,6 +23,12 @@
   align-items: center;
   text-align: center;
   box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
+}
+
+.join-icon {
+  width: 200rpx;
+  height: 200rpx;
+  margin-bottom: 30rpx;
 }
 
 .join-title {
@@ -189,10 +195,74 @@
   border-color: #EF4444 !important;
 }
 
-/* 加载 */
-.loading-box {
+/* ===== 全局加载 - 四分类轮转 ===== */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8rpx);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 40rpx;
+  z-index: 999;
+}
+
+.loading-circle-large {
+  width: 260rpx;
+  height: 260rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100vh;
+  position: relative;
+  box-shadow: 0 12rpx 48rpx rgba(16, 185, 129, 0.35);
+  animation: circleBreathLarge 2s ease-in-out infinite;
+}
+
+@keyframes circleBreathLarge {
+  0%, 100% { transform: scale(1); box-shadow: 0 12rpx 48rpx rgba(16, 185, 129, 0.35); }
+  50% { transform: scale(1.05); box-shadow: 0 16rpx 56rpx rgba(16, 185, 129, 0.5); }
+}
+
+.trash-wrap-large {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.trash-icon-large {
+  position: absolute;
+  width: 120rpx;
+  height: 120rpx;
+  opacity: 0;
+  animation: iconSwitchLarge 3s ease-in-out infinite;
+}
+
+.icon-1 { animation-delay: 0s; }
+.icon-2 { animation-delay: 0.75s; }
+.icon-3 { animation-delay: 1.5s; }
+.icon-4 { animation-delay: 2.25s; }
+
+@keyframes iconSwitchLarge {
+  0% { opacity: 0; transform: scale(0.5) rotate(-10deg); }
+  10% { opacity: 1; transform: scale(1.1) rotate(0deg); }
+  20% { opacity: 1; transform: scale(1) rotate(0deg); }
+  30% { opacity: 0; transform: scale(0.8) rotate(10deg); }
+  100% { opacity: 0; transform: scale(0.5) rotate(-10deg); }
+}
+
+.loading-text-large {
+  font-size: 36rpx;
+  color: #059669;
+  letter-spacing: 8rpx;
+  font-weight: 500;
 }

@@ -51,17 +51,16 @@
           </div>
         </el-card>
       </el-col>
-      
       <!-- 单个班级近7天趋势 - 带班级筛选 -->
       <el-col :span="12">
         <el-card :body-style="{ padding: '10px', height: '100%' }">
           <template #header>
             <div class="trend-header">
               <span>{{ selectedClassName }}近7天学习趋势</span>
-              <el-select 
-                v-model="selectedClassId" 
-                placeholder="选择班级" 
-                size="small" 
+              <el-select
+                v-model="selectedClassId"
+                placeholder="选择班级"
+                size="small"
                 style="width: 140px"
                 @change="onClassSelectChange"
               >
@@ -115,7 +114,6 @@ async function loadDashboard() {
   try {
     const res = await getTeacherDashboard()
     const data = res.data
-    
     stats.value = {
       classCount: data.classCount || 0,
       studentCount: data.studentCount || 0,
@@ -127,16 +125,19 @@ async function loadDashboard() {
     allClassComparison = data.classComparison || []
     classOptions.value = allClassComparison.map(c => ({
       classId: c.classId || c.className,
-      className: c.className
+      className: c.className,
+      studentCount: c.studentCount || 0
     }))
-    
-    // 默认选中第一个班级
-    if (classOptions.value.length > 0 && !selectedClassId.value) {
-      selectedClassId.value = classOptions.value[0].classId
+
+    // 默认选中人数最多的班级
+    if (classOptions.value.length > 0) {
+      const maxClass = classOptions.value.reduce((max, curr) => 
+        curr.studentCount > max.studentCount ? curr : max
+      )
+      selectedClassId.value = maxClass.classId
     }
 
     allDailyTrend = data.dailyTrend || []
-
     await nextTick()
     initBarChart(allClassComparison)
     initLineChart(allDailyTrend, selectedClassId.value)
@@ -171,14 +172,13 @@ function initBarChart(classComparison) {
 
   const currentColors = classComparison.map(c => c.isCurrentClass ? '#10b981' : '#409EFF')
 
-  // 计算图表宽度：每个班级至少80px宽度，确保可滚动
   const minWidth = barChartRef.value.parentElement.clientWidth
   const chartWidth = Math.max(minWidth, classNames.length * 80)
 
   barChart = echarts.init(barChartRef.value, null, {
     width: chartWidth
   })
-  
+
   barChart.setOption({
     tooltip: {
       trigger: 'axis',
@@ -198,32 +198,32 @@ function initBarChart(classComparison) {
         return result
       }
     },
-    legend: { 
-      data: ['人均学习卡片', '人均识别次数'], 
-      bottom: 0, 
-      itemHeight: 8, 
-      textStyle: { fontSize: 11 } 
+    legend: {
+      data: ['人均学习卡片', '人均识别次数'],
+      bottom: 0,
+      itemHeight: 8,
+      textStyle: { fontSize: 11 }
     },
-    grid: { 
-      left: '3%', 
-      right: '4%', 
-      bottom: '40', 
-      top: '10%', 
-      containLabel: true 
+    grid: {
+      left: '3%',
+      right: '4%',
+      bottom: '40',
+      top: '10%',
+      containLabel: true
     },
     xAxis: {
       type: 'category',
       data: classNames,
-      axisLabel: { 
-        interval: 0,  // 强制显示所有标签
-        rotate: classNames.length > 4 ? 30 : 0, 
-        fontSize: 11 
+      axisLabel: {
+        interval: 0,
+        rotate: classNames.length > 4 ? 30 : 0,
+        fontSize: 11
       }
     },
-    yAxis: { 
-      type: 'value', 
-      name: '平均数', 
-      nameTextStyle: { fontSize: 11 } 
+    yAxis: {
+      type: 'value',
+      name: '平均数',
+      nameTextStyle: { fontSize: 11 }
     },
     series: [
       {
@@ -253,21 +253,15 @@ function initLineChart(dailyTrend, classId) {
   if (!lineChartRef.value) return
   if (lineChart) { lineChart.dispose(); lineChart = null }
 
-  // 根据选中的班级过滤数据
   let filteredTrend = []
-  
-  // 检查后端数据是否包含 classId 字段
   const hasClassId = dailyTrend.length > 0 && dailyTrend[0].classId !== undefined
-  
+
   if (hasClassId && classId) {
-    // 后端返回了按班级分组的数据，直接过滤
     filteredTrend = dailyTrend.filter(d => String(d.classId) === String(classId))
   } else {
-    // 后端没有返回按班级分组的数据，显示全部（或需要调用其他接口）
     filteredTrend = dailyTrend
   }
 
-  // 如果没有该班级的数据，显示空
   if (filteredTrend.length === 0) {
     filteredTrend = []
   }
@@ -278,6 +272,7 @@ function initLineChart(dailyTrend, classId) {
     const students = item.studentCount || 1
     return parseFloat((count / students).toFixed(2))
   })
+
   const dailyAvgRecognition = filteredTrend.map(item => {
     const count = item.recognitionCount || 0
     const students = item.studentCount || 1
@@ -296,33 +291,33 @@ function initLineChart(dailyTrend, classId) {
         return result
       }
     },
-    legend: { 
-      data: ['人均学习卡片', '人均识别次数'], 
-      bottom: 0, 
-      itemHeight: 8, 
-      textStyle: { fontSize: 11 } 
+    legend: {
+      data: ['人均学习卡片', '人均识别次数'],
+      bottom: 0,
+      itemHeight: 8,
+      textStyle: { fontSize: 11 }
     },
-    grid: { 
-      left: '3%', 
-      right: '4%', 
-      bottom: '40', 
-      top: '10%', 
-      containLabel: true 
+    grid: {
+      left: '3%',
+      right: '4%',
+      bottom: '40',
+      top: '10%',
+      containLabel: true
     },
-    xAxis: { 
-      type: 'category', 
-      data: dates, 
-      boundaryGap: false, 
-      axisLabel: { 
+    xAxis: {
+      type: 'category',
+      data: dates,
+      boundaryGap: false,
+      axisLabel: {
         fontSize: 11,
-        interval: 0,  // 强制显示所有日期
+        interval: 0,
         rotate: dates.length > 7 ? 30 : 0
-      } 
+      }
     },
-    yAxis: { 
-      type: 'value', 
-      name: '人均数', 
-      nameTextStyle: { fontSize: 11 } 
+    yAxis: {
+      type: 'value',
+      name: '人均数',
+      nameTextStyle: { fontSize: 11 }
     },
     series: [
       {
@@ -385,7 +380,18 @@ onBeforeUnmount(() => {
 
 .stat-card {
   display: flex;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.stat-card :deep(.el-card__body) {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
 }
 
 .stat-icon {
@@ -396,8 +402,7 @@ onBeforeUnmount(() => {
   align-items: center;
   justify-content: center;
   font-size: 20px;
-  margin-right: 10px;
-  flex-shrink: 0;
+  margin-bottom: 10px;
 }
 
 .stat-icon.blue { background: #e0f2fe; color: #0284c7; }
@@ -405,9 +410,20 @@ onBeforeUnmount(() => {
 .stat-icon.orange { background: #ffedd5; color: #ea580c; }
 .stat-icon.purple { background: #f3e8ff; color: #9333ea; }
 
-.stat-value { font-size: 22px; font-weight: bold; color: #333; line-height: 1.2; }
-.stat-label { font-size: 12px; color: #666; margin-top: 2px; }
+.stat-value { 
+  font-size: 24px; 
+  font-weight: bold; 
+  color: #333; 
+  line-height: 1.2; 
+  margin-bottom: 4px;
+}
 
+.stat-label { 
+  font-size: 12px; 
+  color: #666; 
+}
+
+/* 其余样式保持不变 */
 .chart-row {
   flex: 1;
   min-height: 0;
@@ -436,7 +452,6 @@ onBeforeUnmount(() => {
   overflow: hidden;
 }
 
-/* 班级对比图表 - 支持横向滚动 */
 .chart-scroll-wrapper {
   flex: 1;
   min-height: 0;
@@ -449,14 +464,12 @@ onBeforeUnmount(() => {
   min-width: 100%;
 }
 
-/* 趋势图表 */
 .chart {
   flex: 1;
   min-height: 0;
   width: 100%;
 }
 
-/* 趋势图头部 */
 .trend-header {
   display: flex;
   justify-content: space-between;

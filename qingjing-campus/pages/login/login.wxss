@@ -1,70 +1,253 @@
 /* pages/login/login.wxss */
 .login-page {
-  min-height: 100vh;
-  background-color: #f5f7fa;
-  position: relative;
+  height: 100vh;
+  background: linear-gradient(180deg, #10B981 0%, #34D399 45%, #A7F3D0 75%, #ffffff 100%);
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+  position: relative;
 }
 
-.header-bg {
-  height: 400rpx;
-  background: linear-gradient(180deg, #10B981 0%, #059669 100%);
+/* ===== 背景装饰图标 ===== */
+.bg-decor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.leaf {
+  position: absolute;
+  width: 40rpx;
+  height: 60rpx;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 0 100% 0 100%;
+  transform-origin: bottom left;
+}
+
+.leaf-1 { top: 8%; left: 10%; transform: rotate(-30deg) scale(1.2); animation: float 6s ease-in-out infinite; }
+.leaf-2 { top: 15%; right: 12%; transform: rotate(45deg) scale(0.9); animation: float 8s ease-in-out infinite 1s; }
+.leaf-3 { top: 35%; left: 5%; transform: rotate(-15deg) scale(0.7); animation: float 7s ease-in-out infinite 2s; }
+.leaf-4 { top: 40%; right: 8%; transform: rotate(60deg) scale(1); animation: float 5s ease-in-out infinite 0.5s; }
+
+.recycle {
+  position: absolute;
+  font-size: 60rpx;
+  color: rgba(255, 255, 255, 0.12);
+  font-weight: bold;
+}
+
+.recycle-1 { top: 20%; left: 20%; transform: rotate(-15deg); animation: rotate 20s linear infinite; }
+.recycle-2 { top: 45%; right: 15%; transform: rotate(20deg); animation: rotate 25s linear infinite reverse; }
+
+.circle {
+  position: absolute;
+  border-radius: 50%;
+  border: 3rpx solid rgba(255, 255, 255, 0.1);
+}
+
+.circle-1 { width: 120rpx; height: 120rpx; top: 5%; right: 25%; animation: pulse 4s ease-in-out infinite; }
+.circle-2 { width: 80rpx; height: 80rpx; top: 50%; left: 15%; animation: pulse 5s ease-in-out infinite 1s; }
+.circle-3 { width: 160rpx; height: 160rpx; top: 30%; right: 5%; animation: pulse 6s ease-in-out infinite 2s; }
+
+.drop {
+  position: absolute;
+  font-size: 40rpx;
+  color: rgba(255, 255, 255, 0.15);
+}
+
+.drop-1 { top: 55%; left: 8%; animation: float 5s ease-in-out infinite; }
+.drop-2 { top: 10%; right: 30%; animation: float 7s ease-in-out infinite 1.5s; }
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(var(--r, 0deg)); }
+  50% { transform: translateY(-20rpx) rotate(var(--r, 0deg)); }
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.1; }
+  50% { transform: scale(1.1); opacity: 0.2; }
+}
+
+/* ===== 顶部区域 ===== */
+.top-section {
+  height: 66.6vh;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  border-bottom-left-radius: 40rpx;
-  border-bottom-right-radius: 40rpx;
-  flex-shrink: 0;
+  padding-top: 40rpx;
+  position: relative;
+  z-index: 1;
 }
 
 .brand {
   display: flex;
   flex-direction: column;
   align-items: center;
-  color: #ffffff;
+}
+
+.eco-icon {
+  width: 720rpx;
+  height: 720rpx;
+  max-height: 55vh;
+  filter: drop-shadow(0 8rpx 20rpx rgba(0, 0, 0, 0.15));
 }
 
 .app-name {
-  font-size: 48rpx;
+  font-size: 56rpx;
   font-weight: bold;
-  margin-top: 20rpx;
-  letter-spacing: 4rpx;
+  color: #ffffff;
+  letter-spacing: 8rpx;
+  margin-top: 16rpx;
 }
 
 .app-slogan {
-  font-size: 26rpx;
+  font-size: 28rpx;
+  color: #ffffff;
   margin-top: 12rpx;
-  opacity: 0.9;
+  opacity: 0.92;
+  letter-spacing: 2rpx;
 }
 
-.content-card {
-  margin: -60rpx 30rpx 0 30rpx;
-  background: #ffffff;
-  border-radius: 24rpx 24rpx 0 0;
-  padding: 40rpx 20rpx 80rpx 20rpx;
-  box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.06);
-  position: relative;
-  z-index: 1;
+/* ===== 中间白色区域 ===== */
+.mid-section {
   flex: 1;
-}
-
-.wx-login-area {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 60rpx 0;
+  justify-content: center;
+  padding: 0 40rpx;
+  position: relative;
+  z-index: 1;
 }
 
 .wx-tip {
-  font-size: 28rpx;
+  font-size: 34rpx;
   color: #666666;
-  margin-top: 24rpx;
-  margin-bottom: 40rpx;
+  margin-bottom: 28rpx;
+  letter-spacing: 1rpx;
 }
 
+/* ===== 正常状态按钮（适中长度，内容完美居中）===== */
 .wx-btn {
-  width: 80% !important;
-  height: 90rpx !important;
-  font-size: 32rpx !important;
+  width: auto !important;
+  min-width: 320rpx !important;
+  max-width: 80% !important;
+  height: 100rpx !important;
+  padding: 0 60rpx !important;
+  border-radius: 50rpx !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.btn-content {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 16rpx;
+  white-space: nowrap !important;
+}
+
+.btn-text {
+  font-size: 34rpx;
+  color: #ffffff;
+  font-weight: 500;
+  white-space: nowrap !important;
+  line-height: 1;
+}
+
+/* ===== 登录中状态：圆形动画 ===== */
+.loading-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 30rpx;
+}
+
+.loading-circle {
+  width: 180rpx;
+  height: 180rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-shadow: 0 8rpx 32rpx rgba(16, 185, 129, 0.35);
+  animation: circleBreath 2s ease-in-out infinite;
+}
+
+@keyframes circleBreath {
+  0%, 100% { transform: scale(1); box-shadow: 0 8rpx 32rpx rgba(16, 185, 129, 0.35); }
+  50% { transform: scale(1.05); box-shadow: 0 12rpx 40rpx rgba(16, 185, 129, 0.5); }
+}
+
+/* 图标容器 */
+.trash-wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 四个垃圾分类图片：绝对定位叠在一起，依次淡入淡出 */
+.trash-icon {
+  position: absolute;
+  width: 80rpx;
+  height: 80rpx;
+  opacity: 0;
+  animation: iconSwitch 3s ease-in-out infinite;
+}
+
+/* 可回收物 */
+.icon-1 { animation-delay: 0s; }
+/* 有害垃圾 */
+.icon-2 { animation-delay: 0.75s; }
+/* 厨余垃圾 */
+.icon-3 { animation-delay: 1.5s; }
+/* 其他垃圾 */
+.icon-4 { animation-delay: 2.25s; }
+
+@keyframes iconSwitch {
+  0%   { opacity: 0; transform: scale(0.5) rotate(-10deg); }
+  10%  { opacity: 1; transform: scale(1.1) rotate(0deg); }
+  20%  { opacity: 1; transform: scale(1) rotate(0deg); }
+  30%  { opacity: 0; transform: scale(0.8) rotate(10deg); }
+  100% { opacity: 0; transform: scale(0.5) rotate(-10deg); }
+}
+
+/* 登录中文字 */
+.loading-text {
+  font-size: 32rpx;
+  color: #666666;
+  letter-spacing: 6rpx;
+  font-weight: 500;
+}
+
+/* ===== 底部footer ===== */
+.bottom-section {
+  padding: 20rpx 0 40rpx 0;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.footer-text {
+  font-size: 24rpx;
+  color: #999999;
+  letter-spacing: 1rpx;
 }

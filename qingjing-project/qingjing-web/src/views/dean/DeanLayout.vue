@@ -10,7 +10,7 @@
       <div class="header-right">
         <span class="user-name">{{ userInfo.name }}</span>
         <el-dropdown @command="handleCommand">
-          <el-avatar :size="32" :icon="UserFilled" />
+          <el-avatar :size="32" :src="userInfo.avatar || defaultAvatar" />
           <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item command="logout">退出登录</el-dropdown-item>
@@ -46,10 +46,11 @@
 <script setup>
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { UserFilled, DataBoard, School, User, Histogram } from '@element-plus/icons-vue'
+import { DataBoard, User, Histogram } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useUserStore } from '@/stores/userStore'
 import { logout } from '@/api/auth'
+import defaultAvatar from '@/assets/dean-avatar.png'
 
 const route = useRoute()
 const router = useRouter()

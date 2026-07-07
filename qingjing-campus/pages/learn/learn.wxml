@@ -3,6 +3,7 @@
 
 <!-- ========== 概览页 ========== -->
 <view wx:if="{{ pageState === 'overview' }}" class="overview-page">
+  <!-- 顶部进度卡片 -->
   <view class="progress-header">
     <view class="progress-info">
       <text class="progress-title">我的学习进度</text>
@@ -11,31 +12,77 @@
     <view class="progress-bar">
       <view class="progress-fill" style="width: {{ overview.progressPercent }}%;"></view>
     </view>
-    <text class="progress-tip">完成全部学习可获得环保小卫士勋章</text>
   </view>
 
-  <view class="category-grid">
+  <!-- 总体统计卡片 -->
+  <view class="stats-card">
+    <view class="stats-row">
+      <view class="stat-item">
+        <text class="stat-num">{{ overview.totalCardCount }}</text>
+        <text class="stat-label">总卡片</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item">
+        <text class="stat-num">{{ overview.studiedCardCount }}</text>
+        <text class="stat-label">已学习</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item">
+        <text class="stat-num">{{ overview.totalCardCount - overview.studiedCardCount }}</text>
+        <text class="stat-label">待学习</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item highlight">
+        <text class="stat-num">{{ overview.progressPercent }}%</text>
+        <text class="stat-label">完成率</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 分类进度详情 -->
+  <view class="section-title">
+    <van-icon name="bar-chart-o" size="32rpx" color="#10B981" />
+    <text>分类学习进度</text>
+  </view>
+
+  <!-- 可拉伸的分类列表区域 -->
+  <view class="category-progress-list">
     <block wx:for="{{ overview.categories }}" wx:key="mainCategory">
-      <view class="category-card" bindtap="onCategoryTap" data-category="{{ item.mainCategory }}">
-        <!-- 分类封面图：添加binderror调试 -->
-        <image 
-          class="category-cover" 
-          src="{{ item.coverImage }}" 
-          mode="aspectFill"
-          binderror="onImageError"
-          data-index="{{ index }}"
-          data-type="category"
-          data-src="{{ item.coverImage }}"
-        />
-        <view class="category-info">
-          <text class="category-name">{{ item.mainCategory }}</text>
-          <text class="category-count">{{ item.studiedCount }} / {{ item.cardCount }} 张</text>
+      <view class="category-progress-item" bindtap="onCategoryTap" data-category="{{ item.mainCategory }}">
+        <view class="cp-left">
+          <view class="cp-icon" style="background: {{ item.mainCategory === '可回收物' ? '#DBEAFE' : item.mainCategory === '有害垃圾' ? '#FEE2E2' : item.mainCategory === '厨余垃圾' ? '#D1FAE5' : '#F3F4F6' }}">
+            <text class="cp-icon-text" style="color: {{ item.mainCategory === '可回收物' ? '#1E90FF' : item.mainCategory === '有害垃圾' ? '#EF4444' : item.mainCategory === '厨余垃圾' ? '#10B981' : '#6B7280' }}">
+              {{ item.mainCategory === '可回收物' ? '♻' : item.mainCategory === '有害垃圾' ? '☠' : item.mainCategory === '厨余垃圾' ? '🍃' : '🗑' }}
+            </text>
+          </view>
+          <view class="cp-info">
+            <text class="cp-name">{{ item.mainCategory }}</text>
+            <view class="cp-mini-bar">
+              <view class="cp-mini-fill" style="width: {{ item.progressPercent }}%; background: {{ item.mainCategory === '可回收物' ? '#1E90FF' : item.mainCategory === '有害垃圾' ? '#EF4444' : item.mainCategory === '厨余垃圾' ? '#10B981' : '#6B7280' }}"></view>
+            </view>
+          </view>
         </view>
-        <view class="category-progress">
-          <view class="category-progress-fill" style="width: {{ item.progressPercent }}%;"></view>
+        <view class="cp-right">
+          <text class="cp-count">{{ item.studiedCount }}/{{ item.cardCount }}</text>
+          <van-icon name="arrow" color="#cccccc" size="28rpx" />
         </view>
       </view>
     </block>
+  </view>
+
+  <!-- 开始学习按钮 -->
+  <view class="start-learn-section">
+    <van-button
+      type="primary"
+      block
+      round
+      color="linear-gradient(135deg, #10B981 0%, #059669 100%)"
+      custom-class="start-btn"
+      bindtap="startLearning"
+    >
+      <van-icon name="play-circle-o" size="36rpx" color="#ffffff" />
+      <text>开始学习</text>
+    </van-button>
   </view>
 </view>
 
@@ -46,20 +93,21 @@
     <text class="nav-title">{{ currentCategory }}</text>
     <view style="width: 40rpx;"></view>
   </view>
-
   <scroll-view scroll-y class="card-list">
     <block wx:for="{{ cardList }}" wx:key="cardId">
       <view class="card-item {{ item.studied ? 'studied' : '' }}" bindtap="onCardTap" data-index="{{ index }}">
-        <!-- 卡片缩略图：添加binderror调试 -->
-        <image 
-          class="card-thumb" 
-          src="{{ item.cardImage }}" 
-          mode="aspectFill"
-          binderror="onImageError"
-          data-index="{{ index }}"
-          data-type="card"
-          data-src="{{ item.cardImage }}"
-        />
+        <view class="card-thumb-wrap">
+          <image
+            class="card-thumb"
+            src="{{ item.cardImage }}"
+            mode="aspectFill"
+            lazy-load="{{ true }}"
+            binderror="onImageError"
+            data-index="{{ index }}"
+            data-type="card"
+            data-src="{{ item.cardImage }}"
+          />
+        </view>
         <view class="card-info">
           <view class="card-title-row">
             <van-tag color="{{ item.studied ? '#10B981' : '#999' }}" text-color="#ffffff">{{ item.studied ? '已学' : '未学' }}</van-tag>
@@ -80,23 +128,19 @@
     <text class="nav-title">{{ currentCard.cardTitle }}</text>
     <view style="width: 40rpx;"></view>
   </view>
-
   <scroll-view scroll-y class="detail-scroll">
-    <!-- 详情大图：添加binderror调试 -->
-    <image 
-      class="detail-image" 
-      src="{{ currentCard.cardImage }}" 
+    <image
+      class="detail-image"
+      src="{{ currentCard.cardImage }}"
       mode="aspectFill"
       binderror="onImageError"
       data-type="detail"
       data-src="{{ currentCard.cardImage }}"
     />
-    
     <view class="detail-tags">
       <van-tag color="{{ currentCard.mainCategory === '可回收物' ? '#1E90FF' : currentCard.mainCategory === '有害垃圾' ? '#EF4444' : currentCard.mainCategory === '厨余垃圾' ? '#10B981' : '#6B7280' }}" text-color="#ffffff" size="large">{{ currentCard.mainCategory }}</van-tag>
       <text class="detail-sub">{{ currentCard.subCategory }}</text>
     </view>
-
     <view class="detail-section" wx:if="{{ currentCard.commonExamples && currentCard.commonExamples.length > 0 }}">
       <view class="section-label">
         <van-icon name="label-o" size="32rpx" color="#10B981" />
@@ -108,7 +152,6 @@
         </block>
       </view>
     </view>
-
     <view class="detail-section">
       <view class="section-label">
         <van-icon name="description-o" size="32rpx" color="#10B981" />
@@ -116,7 +159,6 @@
       </view>
       <text class="section-text">{{ currentCard.cardContent }}</text>
     </view>
-
     <view class="detail-section">
       <view class="section-label">
         <van-icon name="guide-o" size="32rpx" color="#10B981" />
@@ -124,7 +166,6 @@
       </view>
       <text class="section-text">{{ currentCard.disposalRequirement }}</text>
     </view>
-
     <view class="detail-section">
       <view class="section-label">
         <van-icon name="warning-o" size="32rpx" color="#10B981" />
@@ -133,14 +174,12 @@
       <text class="section-text">{{ currentCard.precautions }}</text>
     </view>
   </scroll-view>
-
   <view class="detail-footer">
     <view class="nav-btns">
       <van-button type="default" size="small" disabled="{{ currentIndex === 0 }}" bindtap="prevCard">上一张</van-button>
       <text class="page-num">{{ currentIndex + 1 }} / {{ cardList.length }}</text>
       <van-button type="default" size="small" disabled="{{ currentIndex === cardList.length - 1 }}" bindtap="nextCard">下一张</van-button>
     </view>
-    
     <van-button
       wx:if="{{ !currentCard.studied }}"
       type="primary"
@@ -165,11 +204,16 @@
   </view>
 </view>
 
-<!-- 全局加载 -->
-<van-overlay show="{{ loading }}" z-index="100">
-  <view class="loading-box">
-    <van-loading type="spinner" color="#10B981" />
+<!-- ========== 全局加载 - 四分类图标轮播 ========== -->
+<view wx:if="{{ loading }}" class="loading-overlay">
+  <view class="loading-circle-large">
+    <view class="trash-wrap-large">
+      <image class="trash-icon-large icon-1" src="/static/images/loading/recycle.png" mode="aspectFit" />
+      <image class="trash-icon-large icon-2" src="/static/images/loading/harmful.png" mode="aspectFit" />
+      <image class="trash-icon-large icon-3" src="/static/images/loading/kitchen.png" mode="aspectFit" />
+      <image class="trash-icon-large icon-4" src="/static/images/loading/other.png" mode="aspectFit" />
+    </view>
   </view>
-</van-overlay>
-
+  <text class="loading-text-large">加载中...</text>
+</view>
 </view>

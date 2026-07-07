@@ -3,97 +3,87 @@
 
 <!-- ===== 未加入班级：输入邀请码 ===== -->
 <view wx:if="{{ !joined && !loading }}" class="join-section">
-    <view class="join-card">
-        <van-icon name="cluster-o" size="120rpx" color="#10B981" />
-        <text class="join-title">加入班级</text>
-        <text class="join-tip">向老师获取 6 位数字邀请码，输入后即可加入班级</text>
-        <van-cell-group inset custom-class="code-input">
-            <van-field
-                model:value="{{ inviteCode }}"
-                type="number"
-                maxlength="6"
-                placeholder="请输入6位邀请码"
-                center
-                clearable
-                border="{{ true }}"
-                use-button-slot
-                bind:input="onInviteCodeInput"
-            >
-                <van-button
-                    slot="button"
-                    size="small"
-                    type="primary"
-                    color="#10B981"
-                    bindtap="joinClass"
-                >
-                    加入
-                </van-button>
-            </van-field>
-        </van-cell-group>
-    </view>
+  <view class="join-card">
+    <image class="join-icon" src="/static/images/join-class.png" mode="aspectFit" />
+    <text class="join-title">加入班级</text>
+    <text class="join-tip">向老师获取 6 位数字邀请码，输入后即可加入班级</text>
+    <van-cell-group inset custom-class="code-input">
+      <van-field
+        model:value="{{ inviteCode }}"
+        type="number"
+        maxlength="6"
+        placeholder="请输入6位邀请码"
+        center
+        clearable
+        border="{{ true }}"
+        use-button-slot
+        bind:input="onInviteCodeInput"
+      >
+        <van-button slot="button" size="small" type="primary" color="#10B981" bindtap="joinClass">加入</van-button>
+      </van-field>
+    </van-cell-group>
+  </view>
 </view>
 
 <!-- ===== 已加入班级：显示班级信息 + 排名 ===== -->
 <view wx:if="{{ joined && !loading }}" class="class-section">
-    <!-- 班级信息卡片 -->
-    <view class="class-info-card">
-        <view class="class-header">
-            <text class="class-name">{{ classInfo.className }}</text>
-            <van-tag color="#10B981" text-color="#ffffff">{{ classInfo.grade }}</van-tag>
-        </view>
-        <text class="class-school">{{ classInfo.schoolName }}</text>
-        <view class="class-stats">
-            <view class="class-stat">
-                <text class="stat-value">{{ classInfo.studentCount }}</text>
-                <text class="stat-label">同学</text>
-            </view>
-            <view class="class-stat">
-                <text class="stat-value">{{ classInfo.myRank }}</text>
-                <text class="stat-label">我的排名</text>
-            </view>
-        </view>
+  <!-- 班级信息卡片 -->
+  <view class="class-info-card">
+    <view class="class-header">
+      <text class="class-name">{{ classInfo.className }}</text>
+      <van-tag color="#10B981" text-color="#ffffff">{{ classInfo.grade }}</van-tag>
     </view>
+    <text class="class-school">{{ classInfo.schoolName }}</text>
+    <view class="class-stats">
+      <view class="class-stat">
+        <text class="stat-value">{{ classInfo.studentCount }}</text>
+        <text class="stat-label">同学</text>
+      </view>
+      <view class="class-stat">
+        <text class="stat-value">{{ classInfo.myRank }}</text>
+        <text class="stat-label">我的排名</text>
+      </view>
+    </view>
+  </view>
 
-    <!-- 排名列表 -->
-    <view class="ranking-title">
-        <van-icon name="medal-o" size="32rpx" color="#F59E0B" />
-        <text>班级学习排行榜</text>
-    </view>
-    <view class="ranking-list">
-        <block wx:for="{{ rankingList }}" wx:key="studentId">
-            <view class="rank-item {{ item.isMe ? 'rank-me' : '' }}">
-                <view class="rank-num">
-                    <text wx:if="{{ index === 0 }}" class="rank-1">🥇</text>
-                    <text wx:elif="{{ index === 1 }}" class="rank-2">🥈</text>
-                    <text wx:elif="{{ index === 2 }}" class="rank-3">🥉</text>
-                    <text wx:else class="rank-normal">{{ index + 1 }}</text>
-                </view>
-                <image class="rank-avatar" src="{{ item.avatarUrl || '/static/images/default-avatar.png' }}" mode="aspectFill" />
-                <view class="rank-info">
-                    <text class="rank-name">{{ item.nickname || item.studentName }}</text>
-                    <text class="rank-detail">已学 {{ item.studiedCardCount }} 张 · 识别 {{ item.totalRecognitionCount }} 次</text>
-                </view>
-                <text class="rank-score">{{ item.studiedCardCount }}张</text>
-            </view>
-        </block>
-    </view>
+  <!-- 排名列表 -->
+  <view class="ranking-title">
+    <van-icon name="medal-o" size="32rpx" color="#F59E0B" />
+    <text>班级学习排行榜</text>
+  </view>
+  <view class="ranking-list">
+    <block wx:for="{{ rankingList }}" wx:key="studentId">
+      <view class="rank-item {{ item.isMe ? 'rank-me' : '' }}">
+        <view class="rank-num">
+          <text wx:if="{{ index === 0 }}" class="rank-1">🥇</text>
+          <text wx:elif="{{ index === 1 }}" class="rank-2">🥈</text>
+          <text wx:elif="{{ index === 2 }}" class="rank-3">🥉</text>
+          <text wx:else class="rank-normal">{{ index + 1 }}</text>
+        </view>
+        <image class="rank-avatar" src="{{ item.avatarUrl || '/static/images/default-avatar.png' }}" mode="aspectFill" />
+        <view class="rank-info">
+          <text class="rank-name">{{ item.nickname || item.studentName }}</text>
+          <text class="rank-detail">已学 {{ item.studiedCardCount }} 张 · 识别 {{ item.totalRecognitionCount }} 次</text>
+        </view>
+        <text class="rank-score">{{ item.studiedCardCount }}张</text>
+      </view>
+    </block>
+  </view>
 
-    <!-- 退出班级按钮 -->
-    <van-button
-        type="default"
-        block
-        round
-        custom-class="leave-btn"
-        bindtap="leaveClass"
-    >
-        退出班级
-    </van-button>
+  <!-- 退出班级按钮 -->
+  <van-button type="default" block round custom-class="leave-btn" bindtap="leaveClass">退出班级</van-button>
 </view>
 
-<!-- ===== 加载中 ===== -->
-<van-overlay show="{{ loading }}" z-index="100">
-    <view class="loading-box">
-        <van-loading type="spinner" color="#10B981" />
+<!-- ===== 全局加载 - 四分类轮转 ===== -->
+<view wx:if="{{ loading }}" class="loading-overlay">
+  <view class="loading-circle-large">
+    <view class="trash-wrap-large">
+      <image class="trash-icon-large icon-1" src="/static/images/loading/recycle.png" mode="aspectFit" />
+      <image class="trash-icon-large icon-2" src="/static/images/loading/harmful.png" mode="aspectFit" />
+      <image class="trash-icon-large icon-3" src="/static/images/loading/kitchen.png" mode="aspectFit" />
+      <image class="trash-icon-large icon-4" src="/static/images/loading/other.png" mode="aspectFit" />
     </view>
-</van-overlay>
+  </view>
+  <text class="loading-text-large">加载中...</text>
+</view>
 </view>

@@ -24,15 +24,21 @@
     "list": [
       {
         "pagePath": "pages/index/index",
-        "text": "识别"
+        "text": "识别",
+        "iconPath": "/static/images/tabbar/scan.png",
+        "selectedIconPath": "/static/images/tabbar/scan-active.png"
       },
       {
         "pagePath": "pages/learn/learn",
-        "text": "学习"
+        "text": "学习",
+        "iconPath": "/static/images/tabbar/learn.png",
+        "selectedIconPath": "/static/images/tabbar/learn-active.png"
       },
       {
         "pagePath": "pages/profile/profile",
-        "text": "我的"
+        "text": "我的",
+        "iconPath": "/static/images/tabbar/profile.png",
+        "selectedIconPath": "/static/images/tabbar/profile-active.png"
       }
     ]
   },

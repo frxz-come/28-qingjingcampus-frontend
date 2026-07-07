@@ -95,7 +95,6 @@
             </el-form-item>
           </el-form>
         </el-card>
-
         <el-descriptions :column="3" border>
           <el-descriptions-item label="学生ID">{{ detailDialog.data.studentId }}</el-descriptions-item>
           <el-descriptions-item label="姓名">{{ detailDialog.data.studentName }}</el-descriptions-item>
@@ -107,7 +106,6 @@
           <el-descriptions-item :label="detailDialog.isFiltered ? '已学卡片(增量)' : '已学卡片'">{{ detailDialog.displayStudiedCardCount }}</el-descriptions-item>
           <el-descriptions-item :label="detailDialog.isFiltered ? '识别次数(增量)' : '识别次数'">{{ detailDialog.displayRecognitionCount }}</el-descriptions-item>
         </el-descriptions>
-
         <el-divider content-position="left">学习记录{{ detailDialog.isFiltered ? '（该时间段内）' : '' }}</el-divider>
         <el-table :data="detailDialog.filteredStudyRecords" border size="small">
           <el-table-column prop="cardTitle" label="卡片标题" min-width="150" />
@@ -122,7 +120,6 @@
           <el-table-column prop="studyTime" label="学习时间" width="160" align="center" />
         </el-table>
         <el-empty v-if="detailDialog.filteredStudyRecords.length === 0" :description="detailDialog.isFiltered ? '该时间段内暂无学习记录' : '暂无学习记录'" :image-size="80" />
-
         <el-divider content-position="left">识别记录（一图多目标）{{ detailDialog.isFiltered ? ' - 该时间段内' : '' }}</el-divider>
         <div v-if="detailDialog.filteredRecognitionSessions.length === 0" class="empty-tip">
           <el-empty :description="detailDialog.isFiltered ? '该时间段内暂无识别记录' : '暂无识别记录'" :image-size="80" />
@@ -234,30 +231,20 @@ function getConfidenceColor(confidence) {
   return '#F56C6C'
 }
 
-/**
- * 获取预览图片列表（优先显示带红框的 detectedImage）
- */
 function getPreviewImages(session) {
   const images = []
-  // 优先显示 detectedImage（带AI红框标注的图片）
   if (session.detectedImage) images.push(session.detectedImage)
-  // 再显示 originalImage（原图）
   if (session.originalImage) images.push(session.originalImage)
   return images
 }
 
-/**
- * 根据日期范围过滤详情数据
- */
 function filterDetailData() {
   const data = detailDialog.data
   if (!data) return
-
   const hasDateRange = detailDialog.dateRange && detailDialog.dateRange.length === 2 && detailDialog.dateRange[0] && detailDialog.dateRange[1]
   detailDialog.isFiltered = !!hasDateRange
 
   if (!hasDateRange) {
-    // 无日期范围：显示全部原始数据
     detailDialog.displayStudiedCardCount = data.studiedCardCount || data.studiedCards || 0
     detailDialog.displayRecognitionCount = data.totalRecognitionCount || data.recognitionCount || 0
     detailDialog.filteredStudyRecords = data.studyRecords || []
@@ -265,11 +252,9 @@ function filterDetailData() {
     return
   }
 
-  // 有日期范围：计算增量
   const startTime = new Date(detailDialog.dateRange[0] + 'T00:00:00').getTime()
   const endTime = new Date(detailDialog.dateRange[1] + 'T23:59:59').getTime()
 
-  // 过滤学习记录
   const allStudyRecords = data.studyRecords || []
   detailDialog.filteredStudyRecords = allStudyRecords.filter(r => {
     if (!r.studyTime) return false
@@ -277,10 +262,8 @@ function filterDetailData() {
     return t >= startTime && t <= endTime
   })
 
-  // 计算学习卡片增量（时间段内已学习的记录数）
   detailDialog.displayStudiedCardCount = detailDialog.filteredStudyRecords.filter(r => r.studyStatus === 1).length
 
-  // 过滤识别记录
   const allRecognitionSessions = data.recognitionSessions || []
   detailDialog.filteredRecognitionSessions = allRecognitionSessions.filter(s => {
     if (!s.recognitionTime) return false
@@ -288,7 +271,6 @@ function filterDetailData() {
     return t >= startTime && t <= endTime
   })
 
-  // 计算识别次数增量
   detailDialog.displayRecognitionCount = detailDialog.filteredRecognitionSessions.reduce((sum, s) => {
     return sum + (s.resultCount || (s.results ? s.results.length : 1))
   }, 0)
@@ -304,19 +286,22 @@ function resetDetailFilter() {
 }
 
 async function loadClassOptions() {
-  console.log('[StudentStats] 开始加载班级列表...')
   try {
     const res = await getClassList()
-    console.log('[StudentStats] 班级列表响应:', res)
     let data = res.data
     if (data && data.records !== undefined) {
       data = data.records
     }
     classOptions.value = Array.isArray(data) ? data : []
-    console.log('[StudentStats] 班级选项:', classOptions.value)
-    if (classOptions.value.length > 0 && !filterForm.value.classId) {
-      filterForm.value.classId = classOptions.value[0].classId
-      console.log('[StudentStats] 自动选择第一个班级:', filterForm.value.classId)
+
+    // 默认选择人数最多的班级
+    if (classOptions.value.length > 0) {
+      const maxClass = classOptions.value.reduce((max, curr) => {
+        const maxCount = max.studentCount || 0
+        const currCount = curr.studentCount || 0
+        return currCount > maxCount ? curr : max
+      })
+      filterForm.value.classId = maxClass.classId
       loadData()
     }
   } catch (e) {
@@ -328,20 +313,16 @@ async function loadClassOptions() {
 
 async function loadData() {
   if (!filterForm.value.classId) {
-    console.log('[StudentStats] 未选择班级，跳过加载')
     return
   }
   loading.value = true
-  console.log('[StudentStats] 开始加载学生数据, classId:', filterForm.value.classId)
   try {
     const params = {
       keyword: filterForm.value.keyword || undefined,
       page: pagination.value.page,
       size: pagination.value.size
     }
-    console.log('[StudentStats] 请求参数:', params)
     const res = await getStudentStats(filterForm.value.classId, params)
-    console.log('[StudentStats] API响应:', res)
     const data = res.data || {}
 
     if (data.records !== undefined) {
@@ -366,9 +347,6 @@ async function loadData() {
       studentList.value = []
       pagination.value.total = 0
     }
-
-    console.log('[StudentStats] 学生列表:', studentList.value)
-    console.log('[StudentStats] 总数:', pagination.value.total)
   } catch (e) {
     console.error('[StudentStats] 加载学生统计失败:', e)
     ElMessage.error(e.response?.data?.message || '加载学生统计失败')
@@ -385,15 +363,23 @@ function handleSearch() {
 }
 
 function onClassChange() {
-  console.log('[StudentStats] 班级变更:', filterForm.value.classId)
   pagination.value.page = 1
   loadData()
 }
 
 function resetFilter() {
-  filterForm.value = {
-    classId: classOptions.value.length > 0 ? classOptions.value[0].classId : '',
-    keyword: ''
+  if (classOptions.value.length > 0) {
+    const maxClass = classOptions.value.reduce((max, curr) => {
+      const maxCount = max.studentCount || 0
+      const currCount = curr.studentCount || 0
+      return currCount > maxCount ? curr : max
+    })
+    filterForm.value = {
+      classId: maxClass.classId,
+      keyword: ''
+    }
+  } else {
+    filterForm.value = { classId: '', keyword: '' }
   }
   pagination.value.page = 1
   loadData()
@@ -434,7 +420,6 @@ async function viewDetail(row) {
 }
 
 onMounted(() => {
-  console.log('[StudentStats] 组件挂载')
   loadClassOptions()
 })
 </script>

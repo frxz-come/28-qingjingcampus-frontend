@@ -1,7 +1,6 @@
 // pages/learn/learn.js
 // ============================================
 // 学习卡片页面逻辑（对接后端 v2.1）
-// 变更：删除 by-sub-category；图片已是 HTTPS 无需 fix；配图 .webp
 // ============================================
 
 import { getStudyOverview, getCardList, getCardDetail, markCardStudied } from '../../utils/api.js';
@@ -22,12 +21,24 @@ Page({
     loading: false
   },
 
-  onLoad() {
+  onLoad(options) {
     this.loadOverview();
+    
+    // 如果从个人中心跳转过来，确保显示概览页（带进度）
+    if (options && options.from === 'profile') {
+      this.setData({ pageState: 'overview' });
+    }
   },
 
   onShow() {
-    if (this.data.pageState === 'overview') {
+    // 检查是否从 profile 页面跳转过来
+    const app = getApp();
+    if (app.globalData.learnFromProfile) {
+      app.globalData.learnFromProfile = false;
+      this.setData({ pageState: 'overview' });
+      this.loadOverview();
+    } else {
+      // 默认每次显示都刷新概览数据，确保进度最新
       this.loadOverview();
     }
   },
@@ -40,16 +51,17 @@ Page({
       const progressPercent = totalCardCount > 0
         ? Math.round((studiedCardCount / totalCardCount) * 100)
         : 0;
-      // v2.1: 图片已是 HTTPS COS 地址，无需 fixImageUrl
+
       const categories = (res.categories || []).map(item => ({
         mainCategory: item.mainCategory,
         cardCount: item.cardCount,
         studiedCount: item.studiedCount,
-        coverImage: item.coverImage,      // 直接使用，已是 HTTPS
+        coverImage: item.coverImage,
         progressPercent: item.cardCount > 0
           ? Math.round((item.studiedCount / item.cardCount) * 100)
           : 0
       }));
+
       this.setData({
         overview: {
           totalCardCount: totalCardCount,
@@ -75,12 +87,26 @@ Page({
     this.loadCardList(category);
   },
 
+  startLearning() {
+    const categories = this.data.overview.categories;
+    const unfinishedCategory = categories.find(item => item.studiedCount < item.cardCount);
+    if (unfinishedCategory) {
+      this.setData({
+        currentCategory: unfinishedCategory.mainCategory,
+        pageState: 'list',
+        loading: true
+      });
+      this.loadCardList(unfinishedCategory.mainCategory);
+    } else {
+      wx.showToast({ title: '恭喜！全部学习完成', icon: 'success' });
+    }
+  },
+
   loadCardList(mainCategory) {
     getCardList(mainCategory).then(res => {
-      // v2.1: 图片已是 HTTPS，直接使用
       const items = (res.items || []).map(item => ({
         ...item,
-        cardImage: item.cardImage         // 直接使用
+        cardImage: item.cardImage
       }));
       this.setData({
         cardList: items,
@@ -105,10 +131,9 @@ Page({
 
   loadCardDetail(cardId) {
     getCardDetail(cardId).then(res => {
-      // v2.1: 图片已是 HTTPS，直接使用
       const card = {
         ...res,
-        cardImage: res.cardImage           // 直接使用
+        cardImage: res.cardImage
       };
       this.setData({
         currentCard: card,
@@ -123,16 +148,13 @@ Page({
   onMarkStudied() {
     const cardId = this.data.currentCard.cardId;
     if (!cardId) return;
-    
+
     this.setData({ loading: true });
     markCardStudied(cardId).then(res => {
       this.setData({ loading: false });
-      
-      // 更新当前卡片状态
       const currentCard = { ...this.data.currentCard, studied: true };
       this.setData({ currentCard });
-      
-      // 更新列表状态
+
       const cardList = this.data.cardList.map((card, idx) => {
         if (idx === this.data.currentIndex) {
           return { ...card, studied: true };
@@ -140,9 +162,9 @@ Page({
         return card;
       });
       this.setData({ cardList });
-      
+
       wx.showToast({ title: '学习完成', icon: 'success' });
-      
+
       if (res.nextCardId) {
         setTimeout(() => {
           const nextIndex = cardList.findIndex(c => c.cardId === res.nextCardId);

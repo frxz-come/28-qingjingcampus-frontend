@@ -10,11 +10,10 @@
       <div class="header-right">
         <span class="user-name">{{ userInfo.name }}</span>
         <el-dropdown @command="handleCommand">
-          <el-avatar :size="32" :icon="UserFilled" />
+          <el-avatar :size="32" :src="userInfo.avatar || defaultAvatar" />
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item command="profile">个人资料</el-dropdown-item>
-              <el-dropdown-item divided command="logout">退出登录</el-dropdown-item>
+              <el-dropdown-item command="logout">退出登录</el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown>
@@ -58,11 +57,12 @@
 <script setup>
 import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { UserFilled, HomeFilled, School, DataAnalysis } from '@element-plus/icons-vue'
+import { HomeFilled, School, DataAnalysis } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useUserStore } from '@/stores/userStore'
 import { logout } from '@/api/auth'
 import { getTeacherInfo } from '@/api/teacher'
+import defaultAvatar from '@/assets/teacher-avatar.png'
 
 const route = useRoute()
 const router = useRouter()
@@ -93,8 +93,6 @@ async function handleCommand(command) {
       router.push('/login')
       ElMessage.success('已退出登录')
     } catch {}
-  } else if (command === 'profile') {
-    ElMessage.info('个人资料功能开发中')
   }
 }
 

@@ -1,30 +1,70 @@
 <!-- pages/login/login.wxml -->
 <view class="login-page">
-  <view class="header-bg">
+  <!-- 背景装饰图标 -->
+  <view class="bg-decor">
+    <view class="leaf leaf-1"></view>
+    <view class="leaf leaf-2"></view>
+    <view class="leaf leaf-3"></view>
+    <view class="leaf leaf-4"></view>
+    <view class="recycle recycle-1">♻</view>
+    <view class="recycle recycle-2">♻</view>
+    <view class="circle circle-1"></view>
+    <view class="circle circle-2"></view>
+    <view class="circle circle-3"></view>
+    <view class="drop drop-1">💧</view>
+    <view class="drop drop-2">💧</view>
+  </view>
+
+  <!-- 顶部区域 -->
+  <view class="top-section">
     <view class="brand">
-      <van-icon name="flower-o" size="80rpx" color="#ffffff" />
+      <image class="eco-icon" src="/static/images/eco-trash.png" mode="aspectFit" />
       <text class="app-name">青净校园</text>
       <text class="app-slogan">垃圾分类，校园更清新</text>
     </view>
   </view>
-  <view class="content-card">
-    <view class="wx-login-area">
-      <van-icon name="wechat" size="120rpx" color="#07C160" />
-      <text class="wx-tip">微信一键登录，快速开始</text>
-      <van-button
-        type="primary"
-        block
-        round
-        color="#07C160"
-        loading="{{ loading }}"
-        custom-class="wx-btn"
-        bindtap="onWxLogin"
-      >
-        微信一键登录
-      </van-button>
+
+  <!-- 中间白色区域 -->
+  <view class="mid-section">
+    <!-- 正常状态提示文字 -->
+    <text class="wx-tip" wx:if="{{ !loading }}">微信一键登录，快速开始</text>
+    
+    <!-- 正常状态：微信登录按钮（横向一行，加长） -->
+    <van-button
+      wx:if="{{ !loading }}"
+      type="primary"
+      block
+      round
+      color="#07C160"
+      custom-class="wx-btn"
+      bindtap="onWxLogin"
+    >
+      <view class="btn-content">
+        <van-icon name="wechat" size="40rpx" color="#ffffff" />
+        <text class="btn-text">一键登陆</text>
+      </view>
+    </van-button>
+    
+    <!-- 登录中状态：圆形图标轮播（使用自定义图片） -->
+    <view wx:if="{{ loading }}" class="loading-box">
+      <view class="loading-circle">
+        <view class="trash-wrap">
+          <!-- 可回收物 -->
+          <image class="trash-icon icon-1" src="/static/images/loading/recycle.png" mode="aspectFit" />
+          <!-- 有害垃圾 -->
+          <image class="trash-icon icon-2" src="/static/images/loading/harmful.png" mode="aspectFit" />
+          <!-- 厨余垃圾 -->
+          <image class="trash-icon icon-3" src="/static/images/loading/kitchen.png" mode="aspectFit" />
+          <!-- 其他垃圾 -->
+          <image class="trash-icon icon-4" src="/static/images/loading/other.png" mode="aspectFit" />
+        </view>
+      </view>
+      <text class="loading-text">登录中...</text>
     </view>
-    <van-divider contentPosition="center" customStyle="margin-top: 40rpx;">
-      青净校园 · 科技+教育
-    </van-divider>
+  </view>
+
+  <!-- 底部footer -->
+  <view class="bottom-section">
+    <text class="footer-text">青净校园 · 科技+教育</text>
   </view>
 </view>

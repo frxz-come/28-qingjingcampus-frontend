@@ -5,7 +5,7 @@
 
 // ⚠️ 开发环境：改成你的后端 IP 或 HTTPS 穿透域名
 // API 请求地址（与图片域名分离）
-export const BASE_URL = 'http://192.168.238.40:8080';
+export const BASE_URL = 'http://192.168.233.40:8080';
 
 function request(url, method = 'GET', data = {}, needAuth = false) {
   return new Promise((resolve, reject) => {

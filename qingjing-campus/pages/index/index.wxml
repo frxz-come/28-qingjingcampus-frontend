@@ -1,41 +1,77 @@
 <!-- pages/index/index.wxml -->
 <!-- v2.1: 优先展示 detectedImage（带框图），支持多目标列表，结果图片可点击放大预览 -->
-
 <view class="scan-page">
   <!-- 全屏图片预览区域 -->
   <view class="preview-area">
     <image wx:if="{{ imageUrl }}" class="preview-image" src="{{ imageUrl }}" mode="aspectFit" />
     <view wx:else class="empty-tip">
-      <van-icon name="photograph" size="120rpx" color="#10B981" />
+      <!-- 卡通风格相机图标 -->
+      <view class="camera-mascot">
+        <view class="camera-body">
+          <view class="camera-lens">
+            <view class="lens-inner"></view>
+            <view class="lens-shine"></view>
+          </view>
+          <view class="camera-flash"></view>
+          <view class="camera-btn"></view>
+        </view>
+        <view class="camera-stand">
+          <view class="stand-leg left"></view>
+          <view class="stand-leg right"></view>
+        </view>
+      </view>
       <text class="tip-text">点击底部按钮拍照或选择相册</text>
       <text class="sub-tip">AI 将自动识别垃圾类别并给出投放建议</text>
     </view>
-
-    <!-- 识别中遮罩 -->
-    <van-overlay show="{{ isRecognizing }}" z-index="100">
-      <view class="recognizing-box">
-        <van-loading type="spinner" color="#10B981" size="60rpx" />
-        <text class="recognizing-text">AI 识别中...</text>
+    <!-- 识别中遮罩 - 四分类图标轮播 -->
+    <view wx:if="{{ isRecognizing }}" class="recognizing-overlay">
+      <view class="loading-circle-large">
+        <view class="trash-wrap-large">
+          <image class="trash-icon-large icon-1" src="/static/images/loading/recycle.png" mode="aspectFit" />
+          <image class="trash-icon-large icon-2" src="/static/images/loading/harmful.png" mode="aspectFit" />
+          <image class="trash-icon-large icon-3" src="/static/images/loading/kitchen.png" mode="aspectFit" />
+          <image class="trash-icon-large icon-4" src="/static/images/loading/other.png" mode="aspectFit" />
+        </view>
       </view>
-    </van-overlay>
+      <text class="loading-text-large">AI 识别中...</text>
+    </view>
   </view>
 
   <!-- 底部悬浮操作按钮 -->
   <view class="float-actions" wx:if="{{ !showResult }}">
-    <view class="action-btn album" bindtap="chooseFromAlbum">
-      <van-icon name="photo-o" size="48rpx" color="#ffffff" />
+    <view class="action-btn album-btn" bindtap="chooseFromAlbum">
+      <view class="btn-icon-wrap album-icon">
+        <view class="album-bg">
+          <view class="album-mountain m1"></view>
+          <view class="album-mountain m2"></view>
+          <view class="album-sun"></view>
+        </view>
+      </view>
       <text>相册</text>
     </view>
     <view class="action-btn camera" bindtap="takePhoto">
-      <van-icon name="photograph" size="60rpx" color="#ffffff" />
+      <view class="camera-main">
+        <view class="camera-ring">
+          <view class="camera-center"></view>
+        </view>
+      </view>
     </view>
-    <view class="action-btn album" bindtap="showHistory">
-      <van-icon name="records-o" size="48rpx" color="#ffffff" />
+    <view class="action-btn record-btn" bindtap="showHistory">
+      <view class="btn-icon-wrap record-icon">
+        <view class="record-bg">
+          <view class="record-list">
+            <view class="record-item r1"></view>
+            <view class="record-item r2"></view>
+            <view class="record-item r3"></view>
+          </view>
+          <view class="record-check"></view>
+        </view>
+      </view>
       <text>记录</text>
     </view>
   </view>
 
-  <!-- 识别结果底部弹出面板（v2.1 多目标适配） -->
+  <!-- 识别结果底部弹出面板 -->
   <van-action-sheet
     show="{{ showResult }}"
     title="识别结果"
@@ -43,24 +79,19 @@
     close-on-click-overlay="{{ true }}"
   >
     <view class="result-panel">
-      <!-- 多目标提示 -->
       <view wx:if="{{ result.targetCount > 1 }}" class="multi-target-tip">
         <van-icon name="warning-o" size="24rpx" color="#F59E0B" />
         <text>检测到 {{ result.targetCount }} 个目标，以下为置信度最高项</text>
       </view>
-
-      <!-- 展示图：优先 detectedImage（带框图），点击可放大预览 -->
       <view class="result-image-box" wx:if="{{ result.displayImage }}">
-        <image 
-          class="result-image" 
-          src="{{ result.displayImage }}" 
-          mode="aspectFit" 
-          bindtap="previewResultImage" 
+        <image
+          class="result-image"
+          src="{{ result.displayImage }}"
+          mode="aspectFit"
+          bindtap="previewResultImage"
         />
         <text wx:if="{{ result.detectedImage }}" class="detected-label">AI 检测框（点击放大）</text>
       </view>
-
-      <!-- 分类结果头部 -->
       <view class="result-header">
         <van-tag
           color="{{ result.categoryColor }}"
@@ -72,20 +103,6 @@
         </van-tag>
         <text class="sub-category">{{ result.subCategory }}</text>
       </view>
-
-      <!-- 置信度进度条 -->
-      <view class="confidence-row">
-        <text class="label">识别置信度</text>
-        <van-progress
-          percentage="{{ result.confidencePercent }}"
-          stroke-height="16rpx"
-          color="{{ result.categoryColor }}"
-          show-pivot="{{ false }}"
-        />
-        <text class="percent-text">{{ result.confidencePercent }}%</text>
-      </view>
-
-      <!-- 投放建议 -->
       <view class="advice-section">
         <view class="section-title">
           <van-icon name="info-o" size="28rpx" color="#10B981" />
@@ -95,8 +112,6 @@
           <text>{{ result.disposalAdvice }}</text>
         </view>
       </view>
-
-      <!-- 操作按钮区 -->
       <view class="result-actions">
         <van-button
           type="default"

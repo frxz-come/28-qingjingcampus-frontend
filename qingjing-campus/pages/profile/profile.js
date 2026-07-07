@@ -3,6 +3,7 @@
 // 个人中心（对接后端 v2.1）
 // 修复：1) 补充 cancelAccount 导入 2) 统一 URL 补全逻辑
 // 新增：手机号换绑功能（使用 PUT /api/auth/phone 接口）
+// 修改：学习进度跳转使用 switchTab + 全局标记
 // ============================================
 
 import { getProfile, updateProfile, uploadAvatar, cancelAccount, bindPhone, changePhone, BASE_URL } from '../../utils/api.js';
@@ -16,7 +17,6 @@ Page({
     loading: false,
     avatarLoading: false,
     avatarUrlTs: 0,
-    // 换绑手机号相关
     showPhonePopup: false,
     phoneInput: '',
     bindingPhone: false
@@ -77,10 +77,12 @@ Page({
     const { tempNickname, tempStudentName } = this.data;
     const nickname = (tempNickname || '').trim();
     const studentName = (tempStudentName || '').trim();
+
     if (!nickname && !studentName) {
       wx.showToast({ title: '请至少填写一项', icon: 'none' });
       return;
     }
+
     wx.showLoading({ title: '保存中...' });
     updateProfile({ nickname, studentName }).then(res => {
       wx.hideLoading();
@@ -96,9 +98,6 @@ Page({
     this.setData({ editing: false });
   },
 
-  // ============================================
-  // 头像上传
-  // ============================================
   onChooseAvatar(e) {
     console.log('【头像】chooseAvatar 事件:', e);
     const tempPath = e.detail.avatarUrl;
@@ -208,15 +207,9 @@ Page({
     }
   },
 
-  // ============================================
-  // 手机号绑定/换绑功能（新增）
-  // ============================================
-
-  // 点击绑定/换绑手机号
   goBindPhone() {
     const { userInfo } = this.data;
     if (userInfo.phone) {
-      // 已绑定，显示换绑弹窗
       wx.showModal({
         title: '换绑手机号',
         content: `当前已绑定：${userInfo.phone}\n是否更换手机号？`,
@@ -233,7 +226,6 @@ Page({
         }
       });
     } else {
-      // 未绑定，直接显示绑定弹窗
       this.setData({
         showPhonePopup: true,
         phoneInput: ''
@@ -241,7 +233,6 @@ Page({
     }
   },
 
-  // 关闭换绑弹窗
   onClosePhonePopup() {
     this.setData({
       showPhonePopup: false,
@@ -249,23 +240,19 @@ Page({
     });
   },
 
-  // 手机号输入
   onPhoneInput(e) {
     this.setData({ phoneInput: e.detail });
   },
 
-  // 确认绑定/换绑
   onConfirmBindPhone() {
     const { phoneInput, userInfo } = this.data;
     const phone = phoneInput.trim();
 
-    // 手机号格式校验
     if (!/^1[3-9]\d{9}$/.test(phone)) {
       wx.showToast({ title: '请输入正确的11位手机号', icon: 'none' });
       return;
     }
 
-    // 如果新手机号与当前一致，提示无需更换
     if (phone === userInfo.phone) {
       wx.showToast({ title: '新手机号与当前一致', icon: 'none' });
       return;
@@ -274,23 +261,17 @@ Page({
     this.setData({ bindingPhone: true });
     wx.showLoading({ title: userInfo.phone ? '换绑中...' : '绑定中...' });
 
-    // 根据是否已绑定选择接口
     const apiCall = userInfo.phone ? changePhone(phone) : bindPhone(phone);
-
     apiCall.then(res => {
       wx.hideLoading();
       this.setData({ bindingPhone: false });
-
-      // 更新本地用户信息
       const newUserInfo = { ...userInfo, phone: res.phone || phone };
       wx.setStorageSync('userInfo', JSON.stringify(newUserInfo));
-
       this.setData({
         userInfo: newUserInfo,
         showPhonePopup: false,
         phoneInput: ''
       });
-
       wx.showToast({
         title: userInfo.phone ? '换绑成功' : '绑定成功',
         icon: 'success'
@@ -299,8 +280,6 @@ Page({
       wx.hideLoading();
       this.setData({ bindingPhone: false });
       console.error('【换绑/绑定失败】完整错误:', err);
-      
-      // 根据后端错误码显示具体错误信息
       let errMsg = '操作失败，请重试';
       if (err.code === 400) {
         if (err.message && err.message.includes('尚未绑定手机号')) {
@@ -321,7 +300,6 @@ Page({
       } else if (err.code === 503) {
         errMsg = '手机号加密未配置，请联系管理员';
       }
-      
       wx.showToast({
         title: errMsg,
         icon: 'none',
@@ -330,9 +308,6 @@ Page({
     });
   },
 
-  // ============================================
-  // 页面跳转
-  // ============================================
   goToHistory() {
     wx.navigateTo({ url: '/pages/history/history' });
   },
@@ -341,13 +316,13 @@ Page({
     wx.navigateTo({ url: '/pages/class/class' });
   },
 
+  // 修改：使用 switchTab 跳转，通过全局数据传递标记
   goToLearn() {
+    const app = getApp();
+    app.globalData.learnFromProfile = true;
     wx.switchTab({ url: '/pages/learn/learn' });
   },
 
-  // ============================================
-  // 退出/注销
-  // ============================================
   onLogout() {
     wx.showModal({
       title: '确认退出',

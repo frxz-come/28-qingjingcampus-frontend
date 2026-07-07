@@ -56,7 +56,7 @@ Page({
   viewDetail(e) {
     const index = e.currentTarget.dataset.index;
     const item = this.data.historyList[index];
-    // v2.1: 跳转到识别详情（sessionId）
+    // v2.1: 跳转到识别详情（sessionId），带上 recordId 用于热力图页调详情接口补全 detectedImage
     wx.navigateTo({
       url: `/pages/heatmap/heatmap?recordId=${item.recordId}&originalImage=${encodeURIComponent(item.originalImage)}&category=${encodeURIComponent(item.garbageCategory)}&subCategory=${encodeURIComponent(item.subCategory)}&color=${encodeURIComponent(this.getCategoryColor(item.garbageCategory))}&confidence=${item.confidencePercent}`
     });

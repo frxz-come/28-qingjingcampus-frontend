@@ -4,7 +4,7 @@
     "van-icon": "@vant/weapp/icon/index",
     "van-divider": "@vant/weapp/divider/index"
   },
-  "navigationBarTitleText": "登录",
+  "navigationBarTitleText": "",
   "navigationBarBackgroundColor": "#10B981",
   "navigationBarTextStyle": "white"
 }

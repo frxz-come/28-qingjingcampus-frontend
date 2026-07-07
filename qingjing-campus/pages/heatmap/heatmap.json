@@ -4,7 +4,7 @@
     "van-button": "@vant/weapp/button/index",
     "van-tag": "@vant/weapp/tag/index"
   },
-  "navigationBarTitleText": "识别热力图",
+  "navigationBarTitleText": "识别详情",
   "navigationBarBackgroundColor": "#EF4444",
   "navigationBarTextStyle": "white"
 }

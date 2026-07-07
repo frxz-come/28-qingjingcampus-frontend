@@ -14,7 +14,7 @@ Page({
     showResult: false,
     result: {
       sessionId: '',
-      displayImage: '', // detectedImage || originalImage
+      displayImage: '',
       originalImage: '',
       detectedImage: '',
       garbageCategory: '',
@@ -24,7 +24,7 @@ Page({
       disposalAdvice: '',
       categoryColor: '',
       targetCount: 0,
-      targets: [] // 多目标列表，每项含 resultId
+      targets: []
     }
   },
 
@@ -84,8 +84,8 @@ Page({
       isRecognizing: false,
       showResult: true,
       result: {
-        sessionId: data.recordId || '', // v2.1: recordId 即 sessionId
-        displayImage: data.detectedImage || data.originalImage || '', // 优先展示带框图
+        sessionId: data.recordId || '',
+        displayImage: data.detectedImage || data.originalImage || '',
         originalImage: data.originalImage || '',
         detectedImage: data.detectedImage || '',
         garbageCategory: category,
@@ -98,9 +98,8 @@ Page({
         targets: data.targets || []
       }
     });
-    // 保存到本地历史
     this.saveToHistory({
-      id: data.recordId, // sessionId
+      id: data.recordId,
       imageUrl: this.data.imageUrl,
       originalImage: data.originalImage,
       detectedImage: data.detectedImage,
@@ -126,22 +125,18 @@ Page({
     this.setData({ showResult: false });
   },
 
-  // 预览识别结果图片（点击放大）
   previewResultImage() {
     const { displayImage, originalImage } = this.data.result;
     const urls = [];
     if (displayImage) urls.push(displayImage);
     if (originalImage && originalImage !== displayImage) urls.push(originalImage);
-    
     if (urls.length === 0) return;
-    
     wx.previewImage({
       urls: urls,
       current: displayImage || urls[0]
     });
   },
 
-  // 查看热力图（主目标）
   viewHeatmap() {
     const result = this.data.result;
     const mainTarget = result.targets[0] || {};
@@ -150,11 +145,10 @@ Page({
       return;
     }
     wx.navigateTo({
-      url: `/pages/heatmap/heatmap?originalImage=${encodeURIComponent(result.originalImage)}&heatmapImage=${encodeURIComponent(mainTarget.heatmapImage)}&category=${encodeURIComponent(result.garbageCategory)}&subCategory=${encodeURIComponent(result.subCategory)}&color=${encodeURIComponent(result.categoryColor)}&confidence=${result.confidencePercent}`
+      url: `/pages/heatmap/heatmap?detectedImage=${encodeURIComponent(result.detectedImage || '')}&originalImage=${encodeURIComponent(result.originalImage)}&heatmapImage=${encodeURIComponent(mainTarget.heatmapImage)}&category=${encodeURIComponent(result.garbageCategory)}&subCategory=${encodeURIComponent(result.subCategory)}&color=${encodeURIComponent(result.categoryColor)}&confidence=${result.confidencePercent}&disposalAdvice=${encodeURIComponent(result.disposalAdvice || '')}`
     });
   },
 
-  // 识别有误，去反馈页面（使用主目标的 resultId）
   goFeedback() {
     const result = this.data.result;
     const mainTarget = result.targets[0];

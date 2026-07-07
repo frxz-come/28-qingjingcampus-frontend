@@ -1,45 +1,45 @@
 <!-- pages/history/history.wxml -->
 <view class="history-page">
-  <!-- 有记录 -->
-  <view wx:if="{{ historyList.length > 0 }}" class="history-list">
-    <block wx:for="{{ historyList }}" wx:key="recordId">
-      <view class="history-item" bindtap="viewDetail" data-index="{{ index }}">
-        <image class="history-image" src="{{ item.originalImage }}" mode="aspectFill" />
-        <view class="history-info">
-          <view class="history-top">
-            <van-tag color="{{ item.garbageCategory === '可回收物' ? '#1E90FF' : item.garbageCategory === '有害垃圾' ? '#EF4444' : item.garbageCategory === '厨余垃圾' ? '#10B981' : '#6B7280' }}" text-color="#ffffff">{{ item.garbageCategory }}</van-tag>
-            <text class="history-time">{{ item.recognitionTime }}</text>
-          </view>
-          <text class="history-sub">{{ item.subCategory }}</text>
-          <view class="history-bottom">
-            <text class="confidence">置信度 {{ item.confidencePercent }}%</text>
-            <van-icon name="arrow" color="#cccccc" />
-          </view>
+
+<!-- 有记录 -->
+<view wx:if="{{ historyList.length > 0 }}" class="history-list">
+  <block wx:for="{{ historyList }}" wx:key="recordId">
+    <view class="history-item" bindtap="viewDetail" data-index="{{ index }}">
+      <image class="history-image" src="{{ item.originalImage }}" mode="aspectFill" />
+      <view class="history-info">
+        <view class="history-top">
+          <van-tag color="{{ item.garbageCategory === '可回收物' ? '#1E90FF' : item.garbageCategory === '有害垃圾' ? '#EF4444' : item.garbageCategory === '厨余垃圾' ? '#10B981' : '#6B7280' }}" text-color="#ffffff">{{ item.garbageCategory }}</van-tag>
+          <text class="history-time">{{ item.recognitionTime }}</text>
+        </view>
+        <text class="history-sub">{{ item.subCategory }}</text>
+        <view class="history-bottom">
+          <van-icon name="arrow" color="#cccccc" />
         </view>
       </view>
-    </block>
-    
-    <!-- 加载更多 -->
-    <view wx:if="{{ loading && historyList.length > 0 }}" class="load-more">
-      <van-loading type="spinner" color="#10B981" size="24rpx" />
-      <text>加载中...</text>
     </view>
-    <view wx:if="{{ !hasMore && historyList.length > 0 }}" class="no-more">
-      没有更多记录了
+  </block>
+
+  <view wx:if="{{ loading && historyList.length > 0 }}" class="load-more">
+    <text>加载中...</text>
+  </view>
+  <view wx:if="{{ !hasMore && historyList.length > 0 }}" class="no-more">没有更多记录了</view>
+</view>
+
+<!-- 无记录 -->
+<van-empty wx:else description="暂无识别记录" image="search">
+  <van-button type="primary" round color="#1E90FF" custom-class="empty-btn" bind:click="goToScan">去拍照识别</van-button>
+</van-empty>
+
+<!-- 全局加载 - 四分类图标轮播 -->
+<view wx:if="{{ loading && historyList.length === 0 }}" class="loading-overlay">
+  <view class="loading-circle-large">
+    <view class="trash-wrap-large">
+      <image class="trash-icon-large icon-1" src="/static/images/loading/recycle.png" mode="aspectFit" />
+      <image class="trash-icon-large icon-2" src="/static/images/loading/harmful.png" mode="aspectFit" />
+      <image class="trash-icon-large icon-3" src="/static/images/loading/kitchen.png" mode="aspectFit" />
+      <image class="trash-icon-large icon-4" src="/static/images/loading/other.png" mode="aspectFit" />
     </view>
   </view>
-
-  <!-- 无记录 -->
-  <van-empty wx:else description="暂无识别记录" image="search">
-    <van-button type="primary" round color="#1E90FF" custom-class="empty-btn" bind:click="goToScan">
-      去拍照识别
-    </van-button>
-  </van-empty>
-
-  <!-- 全局加载 -->
-  <van-overlay show="{{ loading && historyList.length === 0 }}" z-index="100">
-    <view class="loading-box">
-      <van-loading type="spinner" color="#10B981" />
-    </view>
-  </van-overlay>
+  <text class="loading-text-large">加载中...</text>
+</view>
 </view>

@@ -1,9 +1,11 @@
 <template>
   <div class="login-page">
-    <!-- 左侧品牌展示区 -->
     <div class="login-left">
+      <!-- 全屏背景图 -->
+      <img src="@/assets/login-bg.png" class="bg-image" alt="背景" />
+      
+      <!-- 文字内容层，放在上方天空区域 -->
       <div class="brand">
-        <div class="logo">🌿</div>
         <h1>青净校园</h1>
         <p>生活垃圾智能分类与投放辅助系统</p>
         <div class="features">
@@ -22,65 +24,28 @@
         </div>
       </div>
     </div>
-
-    <!-- 右侧登录表单区 -->
     <div class="login-right">
       <div class="login-box">
         <h2>欢迎登录</h2>
-        
-        <!-- 角色选择 -->
         <el-radio-group v-model="loginForm.role" class="role-select">
           <el-radio-button label="teacher">教师</el-radio-button>
           <el-radio-button label="dean">教务主任</el-radio-button>
           <el-radio-button label="operator">运维人员</el-radio-button>
         </el-radio-group>
-
-        <!-- 登录表单 -->
-        <el-form
-          :model="loginForm"
-          :rules="rules"
-          ref="formRef"
-          class="login-form"
-        >
+        <el-form :model="loginForm" :rules="rules" ref="formRef" class="login-form">
           <el-form-item prop="account">
-            <el-input
-              v-model="loginForm.account"
-              placeholder="请输入账号"
-              :prefix-icon="User"
-              size="large"
-            />
+            <el-input v-model="loginForm.account" placeholder="请输入账号" :prefix-icon="User" size="large" />
           </el-form-item>
-
           <el-form-item prop="password">
-            <el-input
-              v-model="loginForm.password"
-              type="password"
-              placeholder="请输入密码"
-              :prefix-icon="Lock"
-              size="large"
-              show-password
-              @keyup.enter="handleLogin"
-            />
+            <el-input v-model="loginForm.password" type="password" placeholder="请输入密码" :prefix-icon="Lock" size="large" show-password @keyup.enter="handleLogin" />
           </el-form-item>
-
           <div class="login-options">
             <el-checkbox v-model="rememberMe">记住我</el-checkbox>
           </div>
-
           <el-form-item>
-            <el-button
-              type="primary"
-              size="large"
-              class="login-btn"
-              :loading="loading"
-              @click="handleLogin"
-            >
-              登 录
-            </el-button>
+            <el-button type="primary" size="large" class="login-btn" :loading="loading" @click="handleLogin">登 录</el-button>
           </el-form-item>
         </el-form>
-
-        <!-- 底部链接 -->
         <div class="login-footer">
           <span>还没有账号？</span>
           <el-link type="primary" @click="goRegister">立即注册</el-link>
@@ -133,18 +98,13 @@ async function handleLogin() {
       account: loginForm.account,
       password: loginForm.password
     })
-
     userStore.setLogin(res.data)
     ElMessage.success(res.message)
 
     const role = res.data.role
-    if (role === 'teacher') {
-      router.push('/teacher')
-    } else if (role === 'dean') {
-      router.push('/dean')
-    } else if (role === 'operator') {
-      router.push('/operator')
-    }
+    if (role === 'teacher') router.push('/teacher')
+    else if (role === 'dean') router.push('/dean')
+    else if (role === 'operator') router.push('/operator')
   } catch (e) {
     console.error('登录失败:', e)
   } finally {
@@ -158,43 +118,54 @@ function goRegister() {
 </script>
 
 <style scoped>
-.login-page {
-  display: flex;
-  height: 100vh;
-}
+.login-page { display: flex; height: 100vh; }
 
 .login-left {
   flex: 1;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  position: relative;
+  overflow: hidden;
   display: flex;
-  align-items: center;
   justify-content: center;
-  color: white;
 }
 
+/* 全屏背景图 */
+.bg-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+}
+
+/* 文字内容层，定位在上方天空区域 */
 .brand {
+  position: relative;
+  z-index: 1;
   text-align: center;
-}
-
-.logo {
-  font-size: 80px;
-  margin-bottom: 20px;
+  color: #fff;
+  padding-top: 60px;
+  width: 100%;
 }
 
 .brand h1 {
-  font-size: 36px;
-  margin-bottom: 10px;
+  font-size: 42px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .brand p {
   font-size: 16px;
-  opacity: 0.9;
-  margin-bottom: 40px;
+  opacity: 0.95;
+  margin-bottom: 50px;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
 }
 
 .features {
   display: flex;
-  gap: 30px;
+  gap: 40px;
   justify-content: center;
 }
 
@@ -203,6 +174,10 @@ function goRegister() {
   flex-direction: column;
   align-items: center;
   gap: 8px;
+  background: rgba(0, 0, 0, 0.15);
+  padding: 16px 24px;
+  border-radius: 12px;
+  backdrop-filter: blur(4px);
 }
 
 .feature-item .el-icon {
