@@ -1,5 +1,6 @@
 <!-- pages/index/index.wxml -->
 <!-- v2.1: 优先展示 detectedImage（带框图），支持多目标列表，结果图片可点击放大预览 -->
+
 <view class="scan-page">
   <!-- 全屏图片预览区域 -->
   <view class="preview-area">
@@ -23,6 +24,7 @@
       <text class="tip-text">点击底部按钮拍照或选择相册</text>
       <text class="sub-tip">AI 将自动识别垃圾类别并给出投放建议</text>
     </view>
+
     <!-- 识别中遮罩 - 四分类图标轮播 -->
     <view wx:if="{{ isRecognizing }}" class="recognizing-overlay">
       <view class="loading-circle-large">
@@ -112,17 +114,8 @@
           <text>{{ result.disposalAdvice }}</text>
         </view>
       </view>
+      <!-- 只保留「识别有误」按钮 -->
       <view class="result-actions">
-        <van-button
-          type="default"
-          size="small"
-          round
-          custom-class="action-btn-small"
-          bindtap="viewHeatmap"
-        >
-          <van-icon name="fire-o" size="28rpx" color="#EF4444" />
-          查看热力图
-        </van-button>
         <van-button
           type="default"
           size="small"

@@ -3,6 +3,7 @@
 // 首页 - 垃圾拍照识别逻辑（对接后端 v2.1）
 // 变更：sessionId 替代 recordId；detectedImage 优先展示；targets 含 resultId
 // 新增：识别结果图片点击放大预览
+// 修复：识别完成后重置为初始空状态
 // ============================================
 
 import { recognizeImage } from '../../utils/api.js';
@@ -33,6 +34,29 @@ Page({
     if (!token) {
       wx.redirectTo({ url: '/pages/login/login' });
     }
+  },
+
+  // 重置为初始空状态
+  resetToEmpty() {
+    this.setData({
+      imageUrl: '',
+      isRecognizing: false,
+      showResult: false,
+      result: {
+        sessionId: '',
+        displayImage: '',
+        originalImage: '',
+        detectedImage: '',
+        garbageCategory: '',
+        subCategory: '',
+        confidence: 0,
+        confidencePercent: 0,
+        disposalAdvice: '',
+        categoryColor: '',
+        targetCount: 0,
+        targets: []
+      }
+    });
   },
 
   chooseFromAlbum() {
@@ -73,7 +97,8 @@ Page({
       this.showResult(res);
     }).catch(() => {
       wx.showToast({ title: '识别失败，请重试', icon: 'none' });
-      this.setData({ isRecognizing: false });
+      // 识别失败也重置为空状态
+      this.resetToEmpty();
     });
   },
 
@@ -121,8 +146,9 @@ Page({
     return map[category] || '#10B981';
   },
 
+  // 关闭结果面板时重置为空状态
   closeResult() {
-    this.setData({ showResult: false });
+    this.resetToEmpty();
   },
 
   previewResultImage() {
@@ -137,18 +163,6 @@ Page({
     });
   },
 
-  viewHeatmap() {
-    const result = this.data.result;
-    const mainTarget = result.targets[0] || {};
-    if (!mainTarget.heatmapImage) {
-      wx.showToast({ title: '暂无热力图', icon: 'none' });
-      return;
-    }
-    wx.navigateTo({
-      url: `/pages/heatmap/heatmap?detectedImage=${encodeURIComponent(result.detectedImage || '')}&originalImage=${encodeURIComponent(result.originalImage)}&heatmapImage=${encodeURIComponent(mainTarget.heatmapImage)}&category=${encodeURIComponent(result.garbageCategory)}&subCategory=${encodeURIComponent(result.subCategory)}&color=${encodeURIComponent(result.categoryColor)}&confidence=${result.confidencePercent}&disposalAdvice=${encodeURIComponent(result.disposalAdvice || '')}`
-    });
-  },
-
   goFeedback() {
     const result = this.data.result;
     const mainTarget = result.targets[0];
@@ -156,9 +170,12 @@ Page({
       wx.showToast({ title: '暂无识别记录', icon: 'none' });
       return;
     }
-    wx.navigateTo({
-      url: `/pages/feedback/feedback?resultId=${mainTarget.resultId}&category=${encodeURIComponent(result.garbageCategory)}&subCategory=${encodeURIComponent(result.subCategory)}&color=${encodeURIComponent(result.categoryColor)}`
-    });
+    // 先保存需要传递的数据
+    const feedbackUrl = `/pages/feedback/feedback?resultId=${mainTarget.resultId}&category=${encodeURIComponent(result.garbageCategory)}&subCategory=${encodeURIComponent(result.subCategory)}&color=${encodeURIComponent(result.categoryColor)}`;
+    // 重置为空状态
+    this.resetToEmpty();
+    // 跳转到反馈页
+    wx.navigateTo({ url: feedbackUrl });
   },
 
   showHistory() {
